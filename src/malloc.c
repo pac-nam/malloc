@@ -1,11 +1,10 @@
 #include "../header/liballoc.h"
 
-void		*ft_find_cluster(t_block *block, int size)
+void		*ft_find_cluster(t_block *block, short size)
 {
 	size_t		space_left;
 	t_block		*tmp_block;
 	t_cluster	*cluster;
-	t_cluster	*nextcluster;
 
 	tmp_block = block;
 	while (tmp_block != NULL)
@@ -14,14 +13,10 @@ void		*ft_find_cluster(t_block *block, int size)
 		cluster = (void*)tmp_block + BLOCKSIZE;
 		while (space_left > (size_t)size)
 		{
-		/*	printf("\tspace_left %ld\n", space_left);
-			printf("\tneed %d\n", (int)(size));
-			printf("\tcluster %p\n", cluster);
-			printf("\tcluster->freesize %d\n\n", cluster->freesize);
-		*/	if (cluster->freesize >= size)
+			if (cluster->freesize >= size)
 			{
-				nextcluster = cluster + size;
-				nextcluster->freesize = cluster->freesize - size;
+				if (cluster->freesize != size)
+					(cluster + size)->freesize = cluster->freesize - size;
 				cluster->freesize = -size;
 				return cluster + CLUSTERSIZE;
 			}
@@ -30,25 +25,24 @@ void		*ft_find_cluster(t_block *block, int size)
 		}
 		tmp_block = tmp_block->next;
 	}
-	//ft_putendl("\tspace not found");
+	//ft_putendl("space not found");
 	return (NULL);
 }
 
-void		*ft_new_zone(t_block *block, size_t size)
+void		*ft_new_page(t_block *block, size_t size)
 {
 	size_t		alloc_length;
 	t_block		*new_block;
 	t_cluster	*new_cluster;
 
-	alloc_length = 0;
+	alloc_length = PAGESIZE;
 	while ((size > SMALL && alloc_length < size + BLOCKSIZE)
-	|| (alloc_length < 100 * size + 100 * CLUSTERSIZE + BLOCKSIZE))
+	|| (size <= SMALL && alloc_length < 100 * size + 100 * CLUSTERSIZE + BLOCKSIZE))
 		alloc_length += PAGESIZE;
-	if ((new_block = mmap(NULL, alloc_length, PROT_READ
-	| PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
-		return NULL;
+	if ((new_block = mmap(0, alloc_length, PROT_READ | PROT_WRITE,
+	MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
+		return (NULL);
 	new_block->size = alloc_length - BLOCKSIZE;
-	new_block->free = alloc_length - BLOCKSIZE;
 	new_block->next = block;
 	new_cluster = (void*)new_block + BLOCKSIZE;
 	new_cluster->freesize = new_block->size;
@@ -61,7 +55,7 @@ void		*ft_new_zone(t_block *block, size_t size)
 		g_alloc.large = new_block;
 		return (new_block + BLOCKSIZE);
 	}
-	return (ft_find_cluster(new_block, size + CLUSTERSIZE));
+	return (NULL);
 }
 
 void		*ft_malloc(size_t size)
@@ -73,16 +67,22 @@ void		*ft_malloc(size_t size)
 	else if (size <= TINY)
 	{
 		if ((result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE)) == NULL)
-			result = ft_new_zone(g_alloc.tiny, size);
+		{
+			ft_new_page(g_alloc.tiny, TINY);
+			result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
+		}
 	}
 	else if (size <= SMALL)
 	{
 		if ((result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE)) == NULL)
-			result = ft_new_zone(g_alloc.small, size);
+		{
+			ft_new_page(g_alloc.small, SMALL);
+			result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
+		}
 	}
 	else
 	{
-		result = ft_new_zone(g_alloc.large, size);
+		result = ft_new_page(g_alloc.large, size);
 	}
 	return (result);
 }

@@ -59,13 +59,17 @@ int		main(void)
 	}
 */
 
-	for (size_t i = 0; i < 5; i++)
+	ft_malloc(1200);
+	for (int i = 0; i < 20; i++)
 	{
-		ft_malloc(50 - i);
-		ft_malloc(100 + i);
-		ft_malloc(1000 - (3 * i * 10) - (7 * i));
-	}
+		printf("%d %p\n", i, ft_malloc(14));
+/*		ft_malloc(100 + i % 100);
+		ft_malloc(600 + i % 300);
+		ft_putendl("---------------------------------------------------------------------------------");
+		ft_putnbr_n(i);
 		ft_show_alloc_mem();
+*/	}
+	ft_show_alloc_mem();
 
 
 

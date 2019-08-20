@@ -26,7 +26,7 @@ void    ft_putaddr(void *ptr)
     {
         str[index] = (cpy % 16) + '0';
         if (str[index] > '9')
-            str[index] += 39;
+            str[index] += 7;
         cpy = cpy / 16;
     }
     write(1, str, 14);
