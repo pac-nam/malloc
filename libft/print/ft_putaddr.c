@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
+
 void    ft_putaddr(void *ptr)
 {
     unsigned long long  cpy;

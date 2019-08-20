@@ -112,7 +112,7 @@ PRINT_NAME	=	ft_putchar.c			\
 				ft_putstr_fd.c			\
 				ft_printnchar.c         \
 				ft_printmemory.c        \
-				ft_printaddr.c			\
+				ft_putaddr.c			\
 
 MATH_NAME	=	ft_bracket.c			\
 				ft_sqrt.c				\
