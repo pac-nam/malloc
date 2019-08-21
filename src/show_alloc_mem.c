@@ -47,11 +47,11 @@ void	ft_show_alloc_mem(void)
 {
     t_block     *tmp_page;
 
-    ft_putstr("TINY:");
+    ft_magenta("TINY:");
     ft_print_pages(g_alloc.tiny);
-    ft_putstr("\nSMALL:");
+    ft_magenta("\nSMALL:");
     ft_print_pages(g_alloc.small);
-    ft_putstr("\nLARGES:\n");
+    ft_magenta("\nLARGES:\n");
     tmp_page = g_alloc.large;
     while (tmp_page)
     {

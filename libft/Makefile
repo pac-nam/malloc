@@ -142,6 +142,13 @@ MATH_NAME	=	ft_bracket.c			\
 #				ft_printf_bouxmx.c      \
 #				ft_printf_modulo.c      \
 
+COLOR_NAME	=	ft_blue.c			\
+				ft_cyan.c			\
+				ft_green.c			\
+				ft_magenta.c		\
+				ft_red.c			\
+				ft_yellow.c			\
+
 CONV_O = $(addprefix conversion/, $(CONV_NAME:.c=.o))
 CHAR_O = $(addprefix char/, $(CHAR_NAME:.c=.o))
 MEMORY_O = $(addprefix memory/, $(MEMORY_NAME:.c=.o))
@@ -150,9 +157,11 @@ LIST_O = $(addprefix list/, $(LIST_NAME:.c=.o))
 PRINT_O = $(addprefix print/, $(PRINT_NAME:.c=.o))
 MATH_O = $(addprefix math/, $(MATH_NAME:.c=.o))
 PRINTF_O = $(addprefix printf/, $(PRINTF_NAME:.c=.o))
+COLOR_O = $(addprefix color/, $(COLOR_NAME:.c=.o))
 
 POINT_O =	$(CONV_O) $(CHAR_O) $(MEMORY_O) $(STR_O)	\
 			$(LIST_O) $(PRINT_O) $(MATH_O) $(PRINTF_O)	\
+			$(COLOR_O)									\
 
 all : $(NAME)
 
