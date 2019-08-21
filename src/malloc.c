@@ -6,7 +6,7 @@ void		*ft_find_cluster(t_block *block, short size)
 	t_cluster	*cluster;
 
 	tmp_block = block;
-	while (tmp_block != NULL)
+	while (tmp_block)
 	{
 		cluster = (void*)tmp_block + BLOCKSIZE;
 		while ((void*)cluster < (void*)tmp_block + tmp_block->size)
@@ -16,6 +16,8 @@ void		*ft_find_cluster(t_block *block, short size)
 				(cluster + size)->freesize = cluster->freesize - size;
 				cluster->freesize = -size;
 				ft_bzero(cluster + CLUSTERSIZE, size - CLUSTERSIZE);
+				//printf("metadata %p\n", cluster);
+				//printf("return   %p\n\n", cluster + CLUSTERSIZE);
 				return cluster + CLUSTERSIZE;
 			}
 			cluster += ft_abs(cluster->freesize);
@@ -51,36 +53,30 @@ void		*ft_new_page(t_block *block, size_t size)
 	{
 		g_alloc.large = new_block;
 		new_cluster->freesize = 0;
-		return (new_cluster + CLUSTERSIZE);
 	}
-	return (NULL);
+	return (new_cluster + CLUSTERSIZE);
 }
 
 void		*ft_malloc(size_t size)
 {
 	void	*result;
 
+	result = NULL;
 	if (size == 0)
 		return (NULL);
-	if (size <= TINY)
+	else if (size <= TINY)
 	{
 		if ((result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE)) == NULL)
-		{
-			ft_new_page(g_alloc.tiny, TINY);
-			result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
-		}
+			if (ft_new_page(g_alloc.tiny, TINY))
+				result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
 	}
 	else if (size <= SMALL)
 	{
 		if ((result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE)) == NULL)
-		{
-			ft_new_page(g_alloc.small, SMALL);
-			result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE);
-		}
+			if (ft_new_page(g_alloc.small, SMALL))
+				result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE);
 	}
 	else
-	{
 		result = ft_new_page(g_alloc.large, size);
-	}
 	return (result);
 }

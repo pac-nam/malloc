@@ -85,9 +85,9 @@ void	ft_free(void *ptr)
 {
     t_cluster   *cluster;
 
-    cluster = ptr - CLUSTERSIZE;
-    //printf("ptr: %p\n", cluster);
-    //printf("free size: %d\n", cluster->freesize);
+    cluster = ptr - CLUSTERSIZE; //why does it work ???
+    printf("ptr: %p\n", cluster);
+    printf("to free size: %d\n", cluster->freesize);
     if (cluster->freesize > 0)
         return ;
     else if (cluster->freesize == 0)

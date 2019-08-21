@@ -19,19 +19,20 @@ FLAGS = -Wall -Wextra -Werror
 SRC_NAME	=	malloc.c			\
 				show_alloc_mem.c	\
 				free.c				\
+				realloc.c			\
 
 SRC = $(addprefix src/, $(SRC_NAME))
 
 OBJ = $(SRC:.c=.o)
 
-TESTFILE = main.c
+TESTFILE = main_test.c
 
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJ) $(NAME).a
 
 $(LIBFT):
-	make all -C $(LIBFT)
+	make -C $(LIBFT)
 
 $(LIBFT)clean:
 	make clean -C $(LIBFT)
@@ -55,7 +56,9 @@ clean: $(LIBFT)clean
 	@/bin/rm -f $(OBJ)
 	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "objects deleted"
 
-fclean: clean
+fclean: $(LIBFT)fclean
+	@/bin/rm -f $(OBJ)
+	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "objects deleted"
 	@/bin/rm -f $(NAME).a
 	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "deleted"
 
@@ -63,8 +66,9 @@ lib: all clean
 
 re: fclean all
 
-test: re
-	gcc -Wall -Wextra -Werror -o test_malloc.exe $(TESTFILE) $(NAME).a libft/$(LIBFT).a
-	./test_malloc.exe
+test: all
+	@gcc -Wall -Wextra -Werror -o test_malloc.exe $(TESTFILE) $(NAME).a libft/$(LIBFT).a
+	@./test_malloc.exe
+	@rm test_malloc.exe
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re test $(LIBFT)

@@ -19,5 +19,5 @@ void		ft_bzero(void *s, size_t n)
 	n++;
 	s2 = s;
 	while (n > 1)
-		s2[--n - 1] = '\0';
+		s2[--n - 1] = 0;
 }

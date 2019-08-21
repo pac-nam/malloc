@@ -1,11 +1,5 @@
 #include "../header/liballoc.h"
 
-void    ft_print_var(const char* str, size_t nb)
-{
-    ft_putstr(str);
-    ft_putnbr_n(nb);
-}
-
 void    ft_print_cluster(t_cluster *cluster)
 {
     ft_putstr("\t\t");

@@ -72,9 +72,9 @@ int		main(void)
 	void	*free_it;
 	for (int i = 0; i < 5; i++)
 	{
-		ft_malloc(64);
+		ft_malloc(2);
 		if (i == 2)
-			free_it = ft_malloc(30);
+			free_it = ft_malloc(6);
 	}
 	ft_show_alloc_mem();
 	ft_free(free_it);
