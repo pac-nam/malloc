@@ -44,7 +44,7 @@ typedef struct			s_context
 
 typedef	struct			s_cluster
 {
-	short				freesize;
+	int					freesize;
 }						t_cluster;
 
 typedef struct 			s_block
@@ -64,7 +64,7 @@ t_context				g_alloc;
 
 //https://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html
 # define TINY	64
-# define SMALL	1024
+# define SMALL	256
 # define PAGESIZE getpagesize()
 # define BLOCKSIZE sizeof(t_block)
 # define CLUSTERSIZE sizeof(t_cluster)

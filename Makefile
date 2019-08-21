@@ -18,6 +18,7 @@ FLAGS = -Wall -Wextra -Werror
 
 SRC_NAME	=	malloc.c			\
 				show_alloc_mem.c	\
+				free.c				\
 
 SRC = $(addprefix src/, $(SRC_NAME))
 
