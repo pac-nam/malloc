@@ -12,63 +12,67 @@
 
 NAME = liballoc
 
-LIBFT = libft
+CC = gcc
 
 FLAGS = -Wall -Wextra -Werror
 
-SRC_NAME	=	malloc.c			\
-				show_alloc_mem.c	\
-				free.c				\
-				realloc.c			\
+LIBFT = libft
 
-SRC = $(addprefix src/, $(SRC_NAME))
+SRC_FOLDER = srcs
 
-OBJ = $(SRC:.c=.o)
+INCLUDE_FOLDER = includes
+
+OBJ_FOLDER = objs
 
 TESTFILE = main_test.c
 
-all: $(NAME)
+SRC	=	malloc.c			\
+		show_alloc_mem.c	\
+		free.c				\
+		realloc.c			\
 
-$(NAME): $(LIBFT) $(OBJ) $(NAME).a
+OBJ = $(addprefix $(OBJ_FOLDER)/, $(SRC:.c=.o))
 
-$(LIBFT):
-	make -C $(LIBFT)
+all : $(NAME)
 
-$(LIBFT)clean:
-	make clean -C $(LIBFT)
-
-$(LIBFT)fclean:
-	make fclean -C $(LIBFT)
-
-$(LIBFT)re:
-	make re -C $(LIBFT)
-
-%.a: $(OBJ)
+$(NAME) : $(LIBFT) $(OBJ_FOLDER) $(OBJ)
 	@ar rc $(NAME).a $(OBJ)
 	@ranlib $(NAME).a
-	@printf '\n\033[32m[ ✔ ] %s %s\n\033[0m' $(NAME) "compiled"
+	@echo "\033[32m[ ✔ ] $@ compiled\033[0m"
 
-%.o: %.c
-	@gcc -c $(FLAGS) $< -o $@
-	@printf '\x1b[42m%c\x1b[0m' "|"
+$(OBJ_FOLDER):
+	@mkdir -p $@
+	@echo "creating $(NAME) object..."
 
-clean: $(LIBFT)clean
-	@/bin/rm -f $(OBJ)
-	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "objects deleted"
-
-fclean: $(LIBFT)fclean
-	@/bin/rm -f $(OBJ)
-	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "objects deleted"
-	@/bin/rm -f $(NAME).a
-	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "deleted"
-
-lib: all clean
-
-re: fclean all
+$(OBJ_FOLDER)/%.o: $(SRC_FOLDER)/%.c
+	@$(CC) -I $(INCLUDE_FOLDER) $(FLAGS) -c $< -o $@
 
 test: all
-	@gcc -Wall -Wextra -Werror -o test_malloc.exe $(TESTFILE) $(NAME).a libft/$(LIBFT).a
+	@gcc -Wall -Wextra -Werror -o test_malloc.exe $(TESTFILE) $(NAME).a $(LIBFT)/$(LIBFT).a
 	@./test_malloc.exe
 	@rm test_malloc.exe
 
-.PHONY: all clean fclean re test $(LIBFT)
+lib : all clean
+
+clean : $(LIBFT)clean
+	@/bin/rm -rf $(OBJ_FOLDER)
+	@echo "\033[33m[ ✔ ] $(NAME) objects deleted\033[0m"
+
+fclean : $(LIBFT)fclean
+	@/bin/rm -rf $(OBJ_FOLDER)
+	@echo "\033[33m[ ✔ ] $(NAME) objects deleted\033[0m"
+	@/bin/rm -f $(NAME).a
+	@echo "\033[33m[ ✔ ] $(NAME) deleted\033[0m"
+
+re : fclean all
+
+$(LIBFT):
+	@make -C $(LIBFT)
+
+$(LIBFT)clean:
+	@make clean -C $(LIBFT)
+
+$(LIBFT)fclean:
+	@make fclean -C $(LIBFT)
+
+.PHONY: $(LIBFT) $(OBJ_FOLDER)

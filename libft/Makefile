@@ -12,12 +12,20 @@
 
 NAME = libft
 
+CC = gcc
+
 FLAGS = -Wall -Wextra -Werror
 
+SRC_FOLDER = srcs
+
+INCLUDE_FOLDER = includes
+
+OBJ_FOLDER = objs
+
+CONV_FOLDER = conversion
 CONV_NAME	=	ft_atoi.c				\
 				ft_atoll.c				\
 				ft_itoa.c				\
-				ft_dtoa.c				\
 				ft_itoa_base.c			\
 				ft_lltoa.c              \
 				ft_ulltoa_base.c        \
@@ -25,8 +33,12 @@ CONV_NAME	=	ft_atoi.c				\
 				ft_wcs_convert.c		\
 				ft_conv_utf8.c			\
 				ft_intlen_base.c		\
-				ft_intlen.c			\
+				ft_intlen.c				\
+				ft_lllen.c				\
+				ft_dtoa.c				\
+				ft_itoa_no_malloc.c		\
 
+CHAR_FOLDER = char
 CHAR_NAME	=	ft_isalnum.c			\
 				ft_isalpha.c			\
 				ft_isascii.c			\
@@ -39,6 +51,7 @@ CHAR_NAME	=	ft_isalnum.c			\
 				ft_tolower.c			\
 				ft_toupper.c			\
 
+MEMORY_FOLDER = memory
 MEMORY_NAME =	ft_memalloc.c			\
 				ft_memccpy.c			\
 				ft_memchr.c				\
@@ -48,13 +61,13 @@ MEMORY_NAME =	ft_memalloc.c			\
 				ft_memmove.c			\
 				ft_memset.c				\
 				ft_bzero.c				\
-				ft_realloc.c			\
 				ft_swap.c				\
 				ft_gnl.c				\
 				ft_addncharbefore.c		\
 				ft_memrev.c				\
 				ft_flags.c				\
 
+STR_FOLDER = str
 STR_NAME	=	ft_strcat.c				\
 				ft_strchr.c				\
 				ft_strclr.c				\
@@ -90,7 +103,9 @@ STR_NAME	=	ft_strcat.c				\
 				ft_strrev.c				\
 				ft_strcapitalize.c		\
 				ft_strlowerize.c		\
+				ft_strupperize.c		\
 
+LIST_FOLDER = list
 LIST_NAME	=	ft_lstadd.c				\
 				ft_lstdel.c				\
 				ft_lstdelone.c			\
@@ -101,6 +116,7 @@ LIST_NAME	=	ft_lstadd.c				\
 				ft_lstrev.c				\
 				ft_lstsize.c			\
 
+PRINT_FOLDER = print
 PRINT_NAME	=	ft_putchar.c			\
 				ft_putchar_fd.c			\
 				ft_putendl.c			\
@@ -113,77 +129,91 @@ PRINT_NAME	=	ft_putchar.c			\
 				ft_printnchar.c         \
 				ft_printmemory.c        \
 				ft_putaddr.c			\
+				ft_putdbl.c				\
+				ft_printf.c				\
 
+MATH_FOLDER = math
 MATH_NAME	=	ft_bracket.c			\
 				ft_sqrt.c				\
 				ft_power.c				\
 				ft_random.c				\
 				ft_sort_int_tab.c		\
-				ft_abs.c		\
+				ft_abs.c				\
 
-#PRINTF_NAME	=	ft_printf.c				\
-#				ft_m_count.c            \
-#				ft_last_char.c          \
-#				ft_take_infos.c         \
-#				ft_printf_s.c           \
-#				ft_printf_di.c          \
-#				ft_printf_o.c           \
-#				ft_printf_u.c           \
-#				ft_printf_p.c           \
-#				ft_printf_ms.c          \
-#				ft_printf_md.c          \
-#				ft_printf_x.c           \
-#				ft_printf_mx.c          \
-#				ft_printf_c.c           \
-#				ft_printf_mc.c          \
-#				ft_printf_n.c           \
-#				ft_printf_b.c           \
-#				ft_printf_momu.c        \
-#				ft_printf_bouxmx.c      \
-#				ft_printf_modulo.c      \
+PRINTF_FOLDER = printf_srcs
+#PRINTF_NAME	=	ft_m_count.c            \
+				ft_last_char.c          \
+				ft_take_infos.c         \
+				ft_printf_s.c           \
+				ft_printf_di.c          \
+				ft_printf_o.c           \
+				ft_printf_u.c           \
+				ft_printf_p.c           \
+				ft_printf_ms.c          \
+				ft_printf_md.c          \
+				ft_printf_x.c           \
+				ft_printf_mx.c          \
+				ft_printf_c.c           \
+				ft_printf_mc.c          \
+				ft_printf_n.c           \
+				ft_printf_b.c           \
+				ft_printf_momu.c        \
+				ft_printf_bouxmx.c      \
+				ft_printf_modulo.c      \
 
-COLOR_NAME	=	ft_blue.c			\
-				ft_cyan.c			\
-				ft_green.c			\
-				ft_magenta.c		\
-				ft_red.c			\
-				ft_yellow.c			\
+COLOR_FOLDER = color
+COLOR_NAME	=	ft_blue.c				\
+				ft_cyan.c				\
+				ft_green.c				\
+				ft_magenta.c			\
+				ft_red.c				\
+				ft_yellow.c				\
 
-CONV_O = $(addprefix conversion/, $(CONV_NAME:.c=.o))
-CHAR_O = $(addprefix char/, $(CHAR_NAME:.c=.o))
-MEMORY_O = $(addprefix memory/, $(MEMORY_NAME:.c=.o))
-STR_O = $(addprefix str/, $(STR_NAME:.c=.o))
-LIST_O = $(addprefix list/, $(LIST_NAME:.c=.o))
-PRINT_O = $(addprefix print/, $(PRINT_NAME:.c=.o))
-MATH_O = $(addprefix math/, $(MATH_NAME:.c=.o))
-PRINTF_O = $(addprefix printf/, $(PRINTF_NAME:.c=.o))
-COLOR_O = $(addprefix color/, $(COLOR_NAME:.c=.o))
+SUBFOLDERS =	$(CONV_FOLDER) $(CHAR_FOLDER) $(MEMORY_FOLDER)	\
+				$(STR_FOLDER) $(LIST_FOLDER) $(PRINT_FOLDER)	\
+				$(MATH_FOLDER) $(PRINTF_FOLDER) $(COLOR_FOLDER)	\
 
-POINT_O =	$(CONV_O) $(CHAR_O) $(MEMORY_O) $(STR_O)	\
-			$(LIST_O) $(PRINT_O) $(MATH_O) $(PRINTF_O)	\
-			$(COLOR_O)									\
+CONV_C = $(addprefix $(CONV_FOLDER)/, $(CONV_NAME))
+CHAR_C = $(addprefix $(CHAR_FOLDER)/, $(CHAR_NAME))
+MEMORY_C = $(addprefix $(MEMORY_FOLDER)/, $(MEMORY_NAME))
+STR_C = $(addprefix $(STR_FOLDER)/, $(STR_NAME))
+LIST_C = $(addprefix $(LIST_FOLDER)/, $(LIST_NAME))
+PRINT_C = $(addprefix $(PRINT_FOLDER)/, $(PRINT_NAME))
+MATH_C = $(addprefix $(MATH_FOLDER)/, $(MATH_NAME))
+PRINTF_C = $(addprefix $(PRINTF_FOLDER)/, $(PRINTF_NAME))
+COLOR_C = $(addprefix $(COLOR_FOLDER)/, $(COLOR_NAME))
+
+SRC =	$(CONV_C) $(CHAR_C) $(MEMORY_C) $(STR_C)	\
+		$(LIST_C) $(PRINT_C) $(MATH_C) $(PRINTF_C)	\
+		$(COLOR_C)									\
+
+OBJ = $(addprefix $(OBJ_FOLDER)/, $(SRC:.c=.o))
 
 all : $(NAME)
 
-$(NAME) : $(POINT_O) $(NAME).a
+$(NAME): $(OBJ_FOLDER) $(OBJ)
+	@ar rc $@.a $(OBJ)
+	@ranlib $@.a
+	@echo "\033[32m[ ✔ ] $@ compiled\033[0m"
 
-%.a: $(POINT_O)
-	@ar rc $(NAME).a $(POINT_O)
-	@ranlib $(NAME).a
-	@printf '\n\033[32m[ ✔ ] %s %s\n\033[0m' $(NAME) "compiled"
+$(OBJ_FOLDER):
+	@mkdir -p $@
+	@mkdir -p $(addprefix $@/, $(SUBFOLDERS))
+	@echo "creating $(NAME) object..."
 
-%.o: %.c
-	@gcc -c $(FLAGS) $< -o $@
-	@printf '\x1b[42m%c\x1b[0m' "|"
+$(OBJ_FOLDER)/%.o: $(SRC_FOLDER)/%.c
+	@$(CC) -I$(INCLUDE_FOLDER) -c $(FLAGS) $< -o $@
 
 clean :
-	@/bin/rm -f $(POINT_O)
-	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "objects deleted"
+	@/bin/rm -rf $(OBJ_FOLDER)
+	@echo "\033[33m[ ✔ ] $(NAME) objects deleted\033[0m"
 
 fclean : clean
 	@/bin/rm -f $(NAME).a
-	@printf '\033[33m[ ✔ ] %s %s\n\033[0m' $(NAME) "deleted"
+	@echo "\033[33m[ ✔ ] $(NAME) deleted\033[0m"
 
 lib : all clean
 
 re : fclean all
+
+.PHONY: $(NAME) $(OBJ_FOLDER)
