@@ -15,11 +15,14 @@
 void    ft_print_cluster(t_cluster *cluster)
 {
     ft_putstr("\t\t");
-    ft_putaddr(cluster + CLUSTERSIZE);
+    ft_putaddr((void*)cluster + CLUSTERSIZE);
     ft_putstr(" - ");
-    ft_putaddr(cluster + ft_abs(cluster->freesize));
+    //ft_putstr("|debug ");
+    //ft_putnbr(ft_abs(cluster->freesize));
+    //ft_putstr(" |");
+    ft_putaddr((void*)cluster + ft_abs(cluster->freesize));
     ft_putstr(" ");
-    ft_putnbr((ft_abs(cluster->freesize) - CLUSTERSIZE) * 4);
+    ft_putnbr(ft_abs(cluster->freesize) - CLUSTERSIZE);
     if (cluster->freesize < 0)
         ft_putstr(" used\n");
     else if (cluster->freesize > 0)
@@ -41,7 +44,7 @@ void    ft_print_pages(t_block *page)
         ft_putstr("  ");
         ft_putaddr(tmp_page);
         ft_putstr(" - ");
-        ft_putaddr(tmp_page + tmp_page->size);
+        ft_putaddr((void*)tmp_page + tmp_page->size);
         ft_putstr(" ");
         ft_putnbr(tmp_page->size);
         ft_putstr(" octets\n");
@@ -49,7 +52,7 @@ void    ft_print_pages(t_block *page)
         while ((void*)tmp_cluster < (void*)tmp_page + tmp_page->size)
         {
             ft_print_cluster(tmp_cluster);
-            tmp_cluster += ft_abs(tmp_cluster->freesize);
+            tmp_cluster = (void*)tmp_cluster + ft_abs(tmp_cluster->freesize);
         }
         tmp_page = tmp_page->next;
     }
@@ -68,11 +71,11 @@ void	ft_show_alloc_mem(void)
     while (tmp_page)
     {
         ft_putstr("\t");
-        ft_putaddr(tmp_page + (CLUSTERSIZE / 4 + BLOCKSIZE / 4) / 4);
+        ft_putaddr((void*)tmp_page + CLUSTERSIZE + BLOCKSIZE);
         ft_putstr(" - ");
-        ft_putaddr(tmp_page + tmp_page->size);
+        ft_putaddr((void*)tmp_page + tmp_page->size);
         ft_putstr(" ");
-        ft_putnbr(tmp_page->size);
+        ft_putnbr(tmp_page->size - CLUSTERSIZE - BLOCKSIZE);
         ft_putstr(" octets\n");
         tmp_page = tmp_page->next;
     }

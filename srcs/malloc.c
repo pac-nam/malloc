@@ -14,14 +14,18 @@
 
 size_t		ft_align(size_t x)
 {
+	//return x;
 	return ((x + 15) / 16) * 16;
 }
 
-void		*ft_find_cluster(t_block *block, short size)
+void		*ft_find_cluster(t_block *block, int size)
 {
 	t_block		*tmp_block;
 	t_cluster	*cluster;
+	t_cluster	*new_cluster;
 
+	size = ft_align(size);
+	printf("BALISE1 %d\n", size);
 	tmp_block = block;
 	while (tmp_block)
 	{
@@ -30,22 +34,22 @@ void		*ft_find_cluster(t_block *block, short size)
 		{
 			if (cluster->freesize >= size + (int)CLUSTERSIZE)
 			{
-				ft_bzero(cluster + CLUSTERSIZE, size - CLUSTERSIZE);
-				(cluster + size)->freesize = cluster->freesize - size;
+				ft_bzero((void*)cluster + CLUSTERSIZE, size - CLUSTERSIZE);
+				new_cluster = (t_cluster*)((void*)cluster + size);
+				new_cluster->freesize = cluster->freesize - size;
 				cluster->freesize = -size;
-				//printf("\nold cluster  %p\n", cluster);
-				//printf("new cluster %p\n", cluster + size);
-				//printf("metadata %p\n", cluster);
-				//printf("return   %p\n\n", cluster + CLUSTERSIZE);
-				return cluster + CLUSTERSIZE;
+				printf("\ncluster %p freesize %d\n", cluster, cluster->freesize);
+				printf("new cluster %p\n", new_cluster);
+				printf("return   %p\n\n", (void*)cluster + CLUSTERSIZE);
+				return (void*)cluster + CLUSTERSIZE;
 			}
-			//printf("&cluster + %ld  %p\n", ft_align(ft_abs(cluster->freesize)), cluster + ft_align(ft_abs(cluster->freesize)));
-			cluster += ft_abs(cluster->freesize);
-			//printf("&cluster2 %p\n", cluster);
+			cluster = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
+			printf("cluster %p freesize %d\n", cluster, cluster->freesize);
+			sleep(1);
 		}
 		tmp_block = tmp_block->next;
 	}
-	//ft_putendl("space not found");
+	ft_putendl("space not found");
 	return (NULL);
 }
 
@@ -56,8 +60,9 @@ void		*ft_new_page(t_block *block, size_t size)
 	t_cluster	*new_cluster;
 
 	alloc_length = PAGESIZE;
-	while ((size <= TINY && alloc_length < (TINY * 4 + CLUSTERSIZE) * 100 + BLOCKSIZE)
-	|| (TINY < size && size <= SMALL && alloc_length < (SMALL * 4 + CLUSTERSIZE) * 100 + BLOCKSIZE)
+	while ((size <= TINY && alloc_length < (TINY + CLUSTERSIZE) * 100 + BLOCKSIZE)
+	|| (TINY < size && size <= SMALL
+	&& alloc_length < (SMALL + CLUSTERSIZE) * 100 + BLOCKSIZE)
 	|| (SMALL < size && alloc_length < size + CLUSTERSIZE + BLOCKSIZE))
 		alloc_length += PAGESIZE;
 	if ((new_block = mmap(0, alloc_length, PROT_READ | PROT_WRITE,
@@ -66,7 +71,9 @@ void		*ft_new_page(t_block *block, size_t size)
 	new_block->size = alloc_length;
 	new_block->next = block;
 	new_cluster = (void*)new_block + BLOCKSIZE;
-	new_cluster->freesize = (new_block->size - BLOCKSIZE) / 4;
+	new_cluster->freesize = new_block->size - BLOCKSIZE;
+	//printf("new_block %p\n", new_block);
+	//printf("first ptr: %p\n", (void*)new_cluster + CLUSTERSIZE);
 	if (size <= TINY)
 		g_alloc.tiny = new_block;
 	else if (size <= SMALL)
@@ -76,7 +83,7 @@ void		*ft_new_page(t_block *block, size_t size)
 		g_alloc.large = new_block;
 		new_cluster->freesize = -1;
 	}
-	return (new_cluster + CLUSTERSIZE);
+	return ((void*)new_cluster + CLUSTERSIZE);
 }
 
 void		*ft_malloc(size_t size)
@@ -84,9 +91,9 @@ void		*ft_malloc(size_t size)
 	void	*result;
 
 	result = NULL;
+	printf("new malloc size %ld\n", size);
 	if (size == 0)
 		return (NULL);
-	size = ft_align(size) / 4;
 	if (size <= TINY)
 	{
 		if ((result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE)) == NULL)
@@ -95,11 +102,13 @@ void		*ft_malloc(size_t size)
 	}
 	else if (size <= SMALL)
 	{
+		//printf("alloc small %ld\n", size);
 		if ((result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE)) == NULL)
 			if (ft_new_page(g_alloc.small, SMALL))
 				result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE);
 	}
 	else
 		result = ft_new_page(g_alloc.large, size);
+	printf("malloc end\n");
 	return (result);
 }

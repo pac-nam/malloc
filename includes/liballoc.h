@@ -76,8 +76,8 @@ typedef struct			s_context
 t_context				g_alloc;
 
 //https://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html
-# define TINY	64 / 4
-# define SMALL	256 / 4
+# define TINY	64
+# define SMALL	256
 # define PAGESIZE getpagesize()
 # define BLOCKSIZE ft_align(sizeof(t_block))
 # define CLUSTERSIZE ft_align(sizeof(t_cluster))
