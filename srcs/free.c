@@ -16,12 +16,13 @@ void    ft_free_in_this_page(t_cluster *prev, t_cluster *to_remove)
 {
     t_cluster   *cluster;
 
-    cluster = prev + prev->freesize;
+    cluster = prev + ft_abs(prev->freesize);
     if (to_remove == prev)
     {
         prev->freesize = -prev->freesize;
         if (cluster->freesize > 0)
             prev->freesize += cluster->freesize;
+        return ;
     }
     while (cluster != to_remove)
     {
@@ -36,21 +37,21 @@ void    ft_free_in_this_page(t_cluster *prev, t_cluster *to_remove)
         prev->freesize += to_remove->freesize;
 }
 
-void    ft_free_size(t_block *page, void *to_remove)
+void    ft_free_size(t_block **page, void *to_remove)
 {
     t_block     *prev;
     t_block     *current;
     t_cluster   *cluster;
 
-    prev = page;
+    prev = *page;
     if ((void*)prev < to_remove && to_remove <= (void*)prev + prev->size)
     {
-        ft_free_in_this_page((t_cluster*)prev + BLOCKSIZE, to_remove);
-        cluster = (t_cluster*)page + BLOCKSIZE;
-        if (cluster->freesize == (int)(page->size - BLOCKSIZE))
+        ft_free_in_this_page((t_cluster*)prev + BLOCKSIZE / 4, to_remove);
+        cluster = (t_cluster*)(*page) + BLOCKSIZE / 4;
+        if (cluster->freesize * 4 == (int)((*page)->size - BLOCKSIZE))
         {
-            current = page;
-            page = page->next;
+            current = *page;
+            *page = (*page)->next;
             munmap(current, current->size);
         }
         return ;
@@ -59,9 +60,9 @@ void    ft_free_size(t_block *page, void *to_remove)
     {
         if ((void*)current < to_remove && to_remove <= (void*)current + current->size)
         {
-            ft_free_in_this_page((t_cluster*)current + BLOCKSIZE, to_remove);
-            cluster = (t_cluster*)current + BLOCKSIZE;
-            if (cluster->freesize == (int)(current->size - BLOCKSIZE))
+            ft_free_in_this_page((t_cluster*)current + BLOCKSIZE / 4, to_remove);
+            cluster = (t_cluster*)current + BLOCKSIZE / 4;
+            if (cluster->freesize * 4 == (int)(current->size - BLOCKSIZE))
             {
                 prev->next = current->next;
                 munmap(current, current->size);
@@ -85,11 +86,15 @@ void    ft_free_large(t_block  *ptr)
     tmp = g_alloc.large;
     while (tmp->next)
     {
+        //printf("\nptr: %p\n", ptr);
+        //printf("tmp: %p\n", tmp);
         if (tmp->next == ptr)
         {
             tmp->next = tmp->next->next;
             munmap(ptr, ptr->size);
+            return ;
         }
+        tmp = tmp->next;
     }
 }
 
@@ -97,15 +102,17 @@ void	ft_free(void *ptr)
 {
     t_cluster   *cluster;
 
-    cluster = ptr - CLUSTERSIZE; //why does it work ???
-    printf("ptr: %p\n", cluster);
-    printf("to free size: %d\n", cluster->freesize);
+    if (!ptr)
+        return ;
+    cluster = ptr - CLUSTERSIZE * 4;
+    //printf("ptr: %p\n", cluster);
+    //printf("to free size: %d\n", cluster->freesize);
     if (cluster->freesize > 0)
         return ;
-    else if (cluster->freesize == 0)
-        ft_free_large((t_block*)cluster - BLOCKSIZE);
+    else if (cluster->freesize == -1)
+        ft_free_large((t_block*)cluster - 1);
     else if (-cluster->freesize - CLUSTERSIZE <= TINY)
-        ft_free_size(g_alloc.tiny, cluster);
+        ft_free_size(&g_alloc.tiny, cluster);
     else if (-cluster->freesize - CLUSTERSIZE <= SMALL)
-        ft_free_size(g_alloc.small, cluster);
+        ft_free_size(&g_alloc.small, cluster);
 }

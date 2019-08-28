@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include "header/liballoc.h"
+#include "includes/liballoc.h"
 
 //printf("page size:%p\n", mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
 
@@ -10,6 +10,7 @@ int		main(void)
 {
 	printf("BLOCKSIZE %ld\n", BLOCKSIZE);
 	printf("CLUSTERSIZE %ld\n", CLUSTERSIZE);
+	printf("PAGESIZE %d\n", PAGESIZE);
 /*	char	*ptr1;
 	char	*ptr2;
 	char	*ptr3;
@@ -58,26 +59,32 @@ int		main(void)
 			break;
 	}
 */
-
 /*
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		ft_malloc(64);
-		ft_malloc(100 + i % 100);
-		ft_malloc(600 + i % 300);
+		ft_malloc(65);
+		//ft_malloc(100 + i % 100);
+		//ft_malloc(1000);
 	}
 	ft_show_alloc_mem();
 */
-
-	void	*free_it;
-	for (int i = 0; i < 5; i++)
+	int		nb = 3000;
+	void	*free_it[nb];
+	void	*free_it2[nb];
+	void	*free_it3[nb];
+	for (int i = 0; i < nb; i++)
 	{
-		ft_malloc(2);
-		if (i == 2)
-			free_it = ft_malloc(6);
+		free_it[i] = ft_malloc(30);
+		free_it2[i] = ft_malloc(200);
+		free_it3[i] = ft_malloc(500);
 	}
 	ft_show_alloc_mem();
-	ft_free(free_it);
+	for (int i = 0; i < nb; i++)
+	{
+		ft_free(free_it[i]);
+		ft_free(free_it2[i]);
+		ft_free(free_it3[i]);
+	}
 	ft_show_alloc_mem();
 
 

@@ -19,7 +19,7 @@ void    ft_print_cluster(t_cluster *cluster)
     ft_putstr(" - ");
     ft_putaddr(cluster + ft_abs(cluster->freesize));
     ft_putstr(" ");
-    ft_putnbr(ft_abs(cluster->freesize) - CLUSTERSIZE);
+    ft_putnbr((ft_abs(cluster->freesize) - CLUSTERSIZE) * 4);
     if (cluster->freesize < 0)
         ft_putstr(" used\n");
     else if (cluster->freesize > 0)
@@ -68,7 +68,7 @@ void	ft_show_alloc_mem(void)
     while (tmp_page)
     {
         ft_putstr("\t");
-        ft_putaddr(tmp_page + CLUSTERSIZE + BLOCKSIZE);
+        ft_putaddr(tmp_page + (CLUSTERSIZE / 4 + BLOCKSIZE / 4) / 4);
         ft_putstr(" - ");
         ft_putaddr(tmp_page + tmp_page->size);
         ft_putstr(" ");
