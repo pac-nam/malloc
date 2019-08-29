@@ -14,8 +14,7 @@
 
 size_t		ft_align(size_t x)
 {
-	//return x;
-	return ((x + 15) / 16) * 16;
+	return ((x + ALIGN - 1) / ALIGN) * ALIGN;
 }
 
 void		*ft_find_cluster(t_block *block, int size)
