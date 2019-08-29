@@ -78,7 +78,7 @@ t_context				g_alloc;
 //https://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html
 # define TINY	64
 # define SMALL	256
-# define ALIGN	16
+# define ALIGN	1
 # define PAGESIZE getpagesize()
 # define BLOCKSIZE ft_align(sizeof(t_block))
 # define CLUSTERSIZE ft_align(sizeof(t_cluster))

@@ -61,9 +61,10 @@ void		*ft_new_page(t_block *block, size_t size)
 	alloc_length = PAGESIZE;
 	while ((size <= TINY && alloc_length < (TINY + CLUSTERSIZE) * 100 + BLOCKSIZE)
 	|| (TINY < size && size <= SMALL
-	&& alloc_length < (SMALL + CLUSTERSIZE) * 100 + BLOCKSIZE)
-	|| (SMALL < size && alloc_length < size + CLUSTERSIZE + BLOCKSIZE))
+	&& alloc_length < (SMALL + CLUSTERSIZE) * 100 + BLOCKSIZE))
 		alloc_length += PAGESIZE;
+	if (SMALL < size)
+		alloc_length = size + CLUSTERSIZE + BLOCKSIZE;
 	if ((new_block = mmap(0, alloc_length, PROT_READ | PROT_WRITE,
 	MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
 		return (NULL);

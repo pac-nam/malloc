@@ -69,7 +69,7 @@ int		main(void)
 	ft_show_alloc_mem();
 */
 
-	int		nb = 2;
+	int		nb = 3;
 	void	*free_it[nb*3];
 	ft_putendl("BEFORE EVRYTHING");
 	ft_show_alloc_mem();
@@ -90,7 +90,7 @@ int		main(void)
 			free_it[i] = ft_realloc(free_it[i], 13);
 		ft_memset(free_it[i], 12341, 13);
 		free_it[nb+i] = ft_realloc(free_it[nb+i], 200);
-		free_it[nb*2+i] = ft_realloc(free_it[nb*2+i], 3000);
+		free_it[nb*2+i] = ft_realloc(free_it[nb*2+i], 450);
 	//ft_putendl("----------------------------------------------------");
 	//ft_show_alloc_mem();
 	}

@@ -28,21 +28,17 @@ void    *ft_ugly_realloc(void *ptr, size_t size)
 
 void    *ft_realloc_large(t_block *page, size_t size)
 {
-	size_t		alloc_length;
 	t_block		*new_block;
 
-	alloc_length = PAGESIZE;
-    while (alloc_length < size + CLUSTERSIZE + BLOCKSIZE)
-		alloc_length += PAGESIZE;
-	if (alloc_length == page->size)
+	if (size + BLOCKSIZE + CLUSTERSIZE == page->size)
         return ((void*)page + BLOCKSIZE + CLUSTERSIZE);
-	if ((new_block = mmap(0, alloc_length, PROT_READ | PROT_WRITE,
-	MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
+	if ((new_block = mmap(0, size + BLOCKSIZE + CLUSTERSIZE,
+    PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
 		return (NULL);
-	new_block->size = alloc_length;
+	new_block->size = size + BLOCKSIZE + CLUSTERSIZE;
 	new_block->next = g_alloc.large;
     ft_memcpy((void*)new_block + BLOCKSIZE, (void*)page + BLOCKSIZE,
-    page->size - BLOCKSIZE);
+    ft_biggest(page->size - BLOCKSIZE, size + CLUSTERSIZE));
 	g_alloc.large = new_block;
     ft_free((void*)page + BLOCKSIZE + CLUSTERSIZE);
     //printf("return realloc large %p\n", (void*)new_block + BLOCKSIZE + CLUSTERSIZE);
