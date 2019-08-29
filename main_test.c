@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/time.h> 
+#include <sys/resource.h>
 #include "includes/liballoc.h"
 
 //printf("page size:%p\n", mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
@@ -11,6 +13,7 @@ int		main(void)
 	printf("BLOCKSIZE %ld\n", BLOCKSIZE);
 	printf("CLUSTERSIZE %ld\n", CLUSTERSIZE);
 	printf("PAGESIZE %d\n", PAGESIZE);
+	printf("getrlimit %d\n", RLIMIT_AS);
 /*	char	*ptr1;
 	char	*ptr2;
 	char	*ptr3;
@@ -75,9 +78,9 @@ int		main(void)
 	ft_show_alloc_mem();
 	for (int i = 0; i < nb; i++)
 	{
-		free_it[i] = ft_malloc(21);
-		ft_memset(free_it[i], 5434, 21);
-		free_it[nb+i] = ft_malloc(150);
+		free_it[i] = ft_malloc(55);
+		ft_memset(free_it[i], 5434, 55);
+		free_it[nb+i] = ft_malloc(200);
 		free_it[nb*2+i] = ft_malloc(500);
 	}
 	ft_putendl("AFTER MALLOCS");
@@ -87,10 +90,16 @@ int		main(void)
 		//if (i == 0)
 		//	free_it[i] = ft_realloc(free_it[i], 33);
 		//else
-			free_it[i] = ft_realloc(free_it[i], 13);
-		ft_memset(free_it[i], 12341, 13);
-		free_it[nb+i] = ft_realloc(free_it[nb+i], 200);
-		free_it[nb*2+i] = ft_realloc(free_it[nb*2+i], 450);
+			free_it[i] = ft_realloc(free_it[i], 1);
+		ft_putendl("after tiny");
+	ft_show_alloc_mem();
+		ft_memset(free_it[i], 12341, 1);
+		free_it[nb+i] = ft_realloc(free_it[nb+i], 50);
+		ft_putendl("after small");
+	ft_show_alloc_mem();
+		free_it[nb*2+i] = ft_realloc(free_it[nb*2+i], 201);
+		ft_putendl("after large");
+	ft_show_alloc_mem();
 	//ft_putendl("----------------------------------------------------");
 	//ft_show_alloc_mem();
 	}

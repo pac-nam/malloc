@@ -20,8 +20,12 @@ void    *ft_ugly_realloc(void *ptr, size_t size)
     cluster = (void*)ptr - CLUSTERSIZE;
     if (!(new_ptr = ft_malloc(size)))
         return (NULL);
-    ft_memcpy(new_ptr, ptr,
-    ft_biggest(ft_abs(cluster->freesize) - CLUSTERSIZE, size));
+    if (cluster->freesize == -1)
+        ft_memcpy(new_ptr, ptr,
+        ft_smallest(((t_block*)((void*)cluster - BLOCKSIZE))->size, size));
+    else
+        ft_memcpy(new_ptr, ptr,
+        ft_smallest(ft_abs(cluster->freesize) - CLUSTERSIZE, size));
     ft_free(ptr);
     return (new_ptr);
 }
@@ -38,7 +42,7 @@ void    *ft_realloc_large(t_block *page, size_t size)
 	new_block->size = size + BLOCKSIZE + CLUSTERSIZE;
 	new_block->next = g_alloc.large;
     ft_memcpy((void*)new_block + BLOCKSIZE, (void*)page + BLOCKSIZE,
-    ft_biggest(page->size - BLOCKSIZE, size + CLUSTERSIZE));
+    ft_smallest(page->size - BLOCKSIZE, size + CLUSTERSIZE));
 	g_alloc.large = new_block;
     ft_free((void*)page + BLOCKSIZE + CLUSTERSIZE);
     //printf("return realloc large %p\n", (void*)new_block + BLOCKSIZE + CLUSTERSIZE);
@@ -81,6 +85,7 @@ void	*ft_realloc(void *ptr, size_t size)
 {
     t_cluster   *cluster;
     int         free;
+
 
 	size = ft_align(size);
     if (!ptr)
