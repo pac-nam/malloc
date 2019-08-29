@@ -20,7 +20,8 @@ void    *ft_ugly_realloc(void *ptr, size_t size)
     cluster = (void*)ptr - CLUSTERSIZE;
     if (!(new_ptr = ft_malloc(size)))
         return (NULL);
-    ft_memcpy(new_ptr, ptr, -cluster->freesize - CLUSTERSIZE);
+    ft_memcpy(new_ptr, ptr,
+    ft_biggest(ft_abs(cluster->freesize) - CLUSTERSIZE, size));
     ft_free(ptr);
     return (new_ptr);
 }
@@ -53,12 +54,20 @@ void    *ft_realloc_size(t_cluster *cluster, int size)
     t_cluster   *new_next;
     
     //printf("realloc cluster %p freesize %d\n", cluster, cluster->freesize);
-    if (size + (int)CLUSTERSIZE <= -cluster->freesize)
-        return ((void*)cluster + CLUSTERSIZE);
     old_next = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
+    new_next = (t_cluster*)((void*)cluster + size + CLUSTERSIZE);
+    if (size + (int)CLUSTERSIZE == -cluster->freesize)
+        return ((void*)cluster + CLUSTERSIZE);
+    else if (size + (int)CLUSTERSIZE < -cluster->freesize)
+    {
+        new_next->freesize = ft_abs(cluster->freesize) - (size + CLUSTERSIZE);
+        if (old_next->freesize > 0)
+            new_next->freesize += old_next->freesize;
+        cluster->freesize = -(size + CLUSTERSIZE);
+        return ((void*)cluster + CLUSTERSIZE);
+    }
     if (ft_abs(cluster->freesize) + old_next->freesize < size + 2 * (int)CLUSTERSIZE)
         return ft_ugly_realloc((void*)cluster + CLUSTERSIZE, size);
-    new_next = (t_cluster*)((void*)cluster + size + CLUSTERSIZE);
     //printf("\ncluster %p\n", cluster);
     //printf("old_next %p\n", old_next);
     //printf("new_next %p\n", new_next);

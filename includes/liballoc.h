@@ -57,7 +57,7 @@ typedef struct			s_context
 
 typedef	struct			s_cluster
 {
-	int					freesize;
+	short				freesize;
 }						t_cluster;
 
 typedef struct 			s_block

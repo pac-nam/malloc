@@ -69,26 +69,28 @@ int		main(void)
 	ft_show_alloc_mem();
 */
 
-	int		nb = 3;
+	int		nb = 2;
 	void	*free_it[nb*3];
 	ft_putendl("BEFORE EVRYTHING");
 	ft_show_alloc_mem();
 	for (int i = 0; i < nb; i++)
 	{
-		free_it[i] = ft_malloc(11);
-		free_it[nb+i] = ft_malloc(200);
+		free_it[i] = ft_malloc(21);
+		ft_memset(free_it[i], 5434, 21);
+		free_it[nb+i] = ft_malloc(150);
 		free_it[nb*2+i] = ft_malloc(500);
 	}
 	ft_putendl("AFTER MALLOCS");
 	ft_show_alloc_mem();
-	for (int i = 2; i >= 0; i--)
+	for (int i = 0; i < nb; i++)
 	{
 		//if (i == 0)
 		//	free_it[i] = ft_realloc(free_it[i], 33);
 		//else
-			free_it[i] = ft_realloc(free_it[i], 20);
-		free_it[nb+i] = ft_realloc(free_it[nb+i], 220);
-		free_it[nb*2+i] = ft_realloc(free_it[nb*2+i], 5000);
+			free_it[i] = ft_realloc(free_it[i], 13);
+		ft_memset(free_it[i], 12341, 13);
+		free_it[nb+i] = ft_realloc(free_it[nb+i], 200);
+		free_it[nb*2+i] = ft_realloc(free_it[nb*2+i], 3000);
 	//ft_putendl("----------------------------------------------------");
 	//ft_show_alloc_mem();
 	}

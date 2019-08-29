@@ -139,6 +139,7 @@ MATH_NAME	=	ft_bracket.c			\
 				ft_random.c				\
 				ft_sort_int_tab.c		\
 				ft_abs.c				\
+				ft_biggest.c			\
 
 PRINTF_FOLDER = printf_srcs
 #PRINTF_NAME	=	ft_m_count.c            \
