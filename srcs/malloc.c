@@ -25,7 +25,7 @@ void		*ft_find_cluster(t_block *block, int size)
 	t_cluster	*new_cluster;
 
 	size = ft_align(size);
-	printf("BALISE1 %d\n", size);
+	//printf("BALISE1 %d\n", size);
 	tmp_block = block;
 	while (tmp_block)
 	{
@@ -38,18 +38,18 @@ void		*ft_find_cluster(t_block *block, int size)
 				new_cluster = (t_cluster*)((void*)cluster + size);
 				new_cluster->freesize = cluster->freesize - size;
 				cluster->freesize = -size;
-				printf("\ncluster %p freesize %d\n", cluster, cluster->freesize);
-				printf("new cluster %p\n", new_cluster);
-				printf("return   %p\n\n", (void*)cluster + CLUSTERSIZE);
+				//printf("\ncluster %p freesize %d\n", cluster, cluster->freesize);
+				//printf("new cluster %p\n", new_cluster);
+				//printf("return   %p\n\n", (void*)cluster + CLUSTERSIZE);
 				return (void*)cluster + CLUSTERSIZE;
 			}
 			cluster = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
-			printf("cluster %p freesize %d\n", cluster, cluster->freesize);
-			sleep(1);
+			//printf("cluster %p freesize %d\n", cluster, cluster->freesize);
+			//sleep(1);
 		}
 		tmp_block = tmp_block->next;
 	}
-	ft_putendl("space not found");
+	//ft_putendl("space not found");
 	return (NULL);
 }
 
@@ -91,7 +91,7 @@ void		*ft_malloc(size_t size)
 	void	*result;
 
 	result = NULL;
-	printf("new malloc size %ld\n", size);
+	//printf("new malloc size %ld\n", size);
 	if (size == 0)
 		return (NULL);
 	if (size <= TINY)
@@ -109,6 +109,6 @@ void		*ft_malloc(size_t size)
 	}
 	else
 		result = ft_new_page(g_alloc.large, size);
-	printf("malloc end\n");
+	//printf("malloc end\n");
 	return (result);
 }
