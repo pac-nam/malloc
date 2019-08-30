@@ -24,37 +24,6 @@ void	*ft_realloc(void *ptr, size_t size);
 void	ft_show_alloc_mem(void);
 size_t	ft_align(size_t x);
 
-/*typedef struct			s_cluster
-{
-	void				*start;
-	void				*end;
-	struct s_cluster	*next;
-}						t_cluster;
-
-typedef struct			s_zone
-{
-	void				*start;
-	size_t				length;
-	size_t				used;
-	t_cluster			*vacant;
-	struct s_zone		*next;
-}						t_zone;
-
-typedef struct			s_context
-{
-	t_zone				*tiny;
-	t_zone				*small;
-	t_zone				*large;
-}						t_context;
-*/
-
-/*typedef struct 			s_cluster
-{
-	size_t				size;	// negative size if not used and remove used variable
-	int					used;	// bool
-}						t_cluster;
-*/
-
 typedef	struct			s_cluster
 {
 	short				freesize;
@@ -75,7 +44,6 @@ typedef struct			s_context
 
 t_context				g_alloc;
 
-//https://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html
 # define TINY	64
 # define SMALL	256
 # define ALIGN	1
