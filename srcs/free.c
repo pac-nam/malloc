@@ -37,6 +37,21 @@ void    ft_free_in_this_page(t_cluster *prev, t_cluster *to_remove)
         prev->freesize += to_remove->freesize;
 }
 
+void    ft_free_in_first_page(t_block **page, void *to_remove)
+{
+    t_cluster   *cluster;
+    t_block     *current;
+
+    ft_free_in_this_page((void*)*page + BLOCKSIZE, to_remove);
+    cluster = (t_cluster*)((void*)(*page) + BLOCKSIZE);
+    if (cluster->freesize == (int)((*page)->size - BLOCKSIZE))
+    {
+        current = *page;
+        *page = (*page)->next;
+        munmap(current, current->size);
+    }
+}
+
 void    ft_free_size(t_block **page, void *to_remove)
 {
     t_block     *prev;
@@ -45,31 +60,25 @@ void    ft_free_size(t_block **page, void *to_remove)
 
     prev = *page;
     if ((void*)prev < to_remove && to_remove <= (void*)prev + prev->size)
+        ft_free_in_first_page(page, to_remove);
+    else
     {
-        ft_free_in_this_page((void*)prev + BLOCKSIZE, to_remove);
-        cluster = (t_cluster*)((void*)(*page) + BLOCKSIZE);
-        if (cluster->freesize == (int)((*page)->size - BLOCKSIZE))
+        while ((current = prev->next))
         {
-            current = *page;
-            *page = (*page)->next;
-            munmap(current, current->size);
-        }
-        return ;
-    }
-    while ((current = prev->next))
-    {
-        if ((void*)current < to_remove && to_remove <= (void*)current + current->size)
-        {
-            ft_free_in_this_page((void*)current + BLOCKSIZE, to_remove);
-            cluster = (t_cluster*)((void*)current + BLOCKSIZE);
-            if (cluster->freesize == (int)(current->size - BLOCKSIZE))
+            if ((void*)current < to_remove
+            && to_remove <= (void*)current + current->size)
             {
-                prev->next = current->next;
-                munmap(current, current->size);
+                ft_free_in_this_page((void*)current + BLOCKSIZE, to_remove);
+                cluster = (t_cluster*)((void*)current + BLOCKSIZE);
+                if (cluster->freesize == (int)(current->size - BLOCKSIZE))
+                {
+                    prev->next = current->next;
+                    munmap(current, current->size);
+                }
+                return ;
             }
-            return ;
+            prev = current;
         }
-        prev = current;
     }
 }
 

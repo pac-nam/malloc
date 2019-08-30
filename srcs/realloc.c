@@ -48,17 +48,13 @@ void    *ft_realloc_large(t_block *page, size_t size)
     //printf("return realloc large %p\n", (void*)new_block + BLOCKSIZE + CLUSTERSIZE);
 	return ((void*)new_block + BLOCKSIZE + CLUSTERSIZE);
 }
-void    *ft_realloc_size(t_cluster *cluster, int size)
+
+void    *ft_realloc_size_second(t_cluster *cluster, t_cluster *old_next, int size)
 {
-    t_cluster   *old_next;
     t_cluster   *new_next;
-    
-    //printf("realloc cluster %p freesize %d\n", cluster, cluster->freesize);
-    old_next = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
+
     new_next = (t_cluster*)((void*)cluster + size + CLUSTERSIZE);
-    if (size + (int)CLUSTERSIZE == -cluster->freesize)
-        return ((void*)cluster + CLUSTERSIZE);
-    else if (size + (int)CLUSTERSIZE < -cluster->freesize)
+    if (size + 2 * (int)CLUSTERSIZE <= -cluster->freesize)
     {
         new_next->freesize = ft_abs(cluster->freesize) - (size + CLUSTERSIZE);
         if (old_next->freesize > 0)
@@ -66,26 +62,53 @@ void    *ft_realloc_size(t_cluster *cluster, int size)
         cluster->freesize = -(size + CLUSTERSIZE);
         return ((void*)cluster + CLUSTERSIZE);
     }
-    if (ft_abs(cluster->freesize) + old_next->freesize < size + 2 * (int)CLUSTERSIZE)
+    if (old_next->freesize < 0 || ft_abs(cluster->freesize) + old_next->freesize
+    < size + 2 * (int)CLUSTERSIZE)
         return ft_ugly_realloc((void*)cluster + CLUSTERSIZE, size);
-    //printf("\ncluster %p\n", cluster);
-    //printf("old_next %p\n", old_next);
-    //printf("new_next %p\n", new_next);
-    //printf("size %d\n", size);
-    //printf("ft_abs(cluster->freesize) %d\n", ft_abs(cluster->freesize));
-    new_next->freesize = old_next->freesize - ((size + CLUSTERSIZE) - ft_abs(cluster->freesize));
-    //printf("new_next->freesize %d\n", new_next->freesize);
-    ft_bzero((void*)cluster + ft_abs(cluster->freesize), size - ft_abs(cluster->freesize));
+    //printf("cluster %p\n", cluster);
+    //printf("freesize %d\n", cluster->freesize);
+    //printf("asked %d\n", size + (int)CLUSTERSIZE);
+    //printf("bzero size %d\n", size - ft_abs(cluster->freesize));
+    if (size + (int)CLUSTERSIZE > -cluster->freesize)
+        ft_bzero((void*)cluster + ft_abs(cluster->freesize), size
+        - ft_abs(cluster->freesize));
+    //printf("BALISE b\n");
+    new_next->freesize = old_next->freesize - ((size + CLUSTERSIZE)
+    - ft_abs(cluster->freesize));
+    //printf("BALISE c\n");
     cluster->freesize = -(size + CLUSTERSIZE);
-    //printf("new cluster->freesize %d\n", cluster->freesize);
+    //printf("BALISE d\n");
     return ((void*)cluster + CLUSTERSIZE);
+}
+
+void    *ft_realloc_size(t_cluster *cluster, int size)
+{
+    t_cluster   *old_next;
+    void        *to_return;
+
+    //printf("BALISE1\n");
+    old_next = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
+    if (size + (int)CLUSTERSIZE == -cluster->freesize)
+        to_return = ((void*)cluster + CLUSTERSIZE);
+    else if (old_next->freesize > 0 && size + (int)CLUSTERSIZE
+    == -cluster->freesize + old_next->freesize)
+    {
+        cluster->freesize = cluster->freesize - old_next->freesize;
+        ft_bzero((void*)old_next, old_next->freesize);
+        to_return = ((void*)cluster + CLUSTERSIZE);
+    }
+    else
+        to_return = (ft_realloc_size_second(cluster, old_next, size));
+    //printf("BALISE2\n");
+    return (to_return);
 }
 
 void	*ft_realloc(void *ptr, size_t size)
 {
+    //printf("BALISE3\n");
     t_cluster   *cluster;
     int         free;
-
+    void        *to_return;
 
 	size = ft_align(size);
     if (!ptr)
@@ -96,13 +119,15 @@ void	*ft_realloc(void *ptr, size_t size)
     //printf("to realloc size: %ld\n", size);
     //printf("actual size: %d\n", cluster->freesize);
     if (cluster->freesize > 0)
-        return ft_malloc(size);
+        to_return = ft_malloc(size);
     else if (cluster->freesize == -1 && size > SMALL)
-        return ft_realloc_large((t_block*)((void*)cluster - BLOCKSIZE), size);
+        to_return = ft_realloc_large((t_block*)((void*)cluster - BLOCKSIZE), size);
     else if (TINY < free && free <= SMALL && TINY < size && size <= SMALL)
-        return ft_realloc_size(cluster, size);
+        to_return = ft_realloc_size(cluster, size);
     else if (free <= TINY && size <= TINY)
-        return ft_realloc_size(cluster, size);
+        to_return = ft_realloc_size(cluster, size);
     else
-        return ft_ugly_realloc(ptr, size);
+        to_return = ft_ugly_realloc(ptr, size);
+    //printf("BALISE4\n");
+    return (to_return);
 }

@@ -72,14 +72,14 @@ int		main(void)
 	ft_show_alloc_mem();
 */
 
-	int		nb = 3;
+	int		nb = 300;
 	void	*free_it[nb*3];
 	ft_putendl("BEFORE EVRYTHING");
 	ft_show_alloc_mem();
 	for (int i = 0; i < nb; i++)
 	{
-		free_it[i] = ft_malloc(55);
-		ft_memset(free_it[i], 5434, 55);
+		free_it[i] = ft_malloc(20);
+		ft_memset(free_it[i], 5434, 20);
 		free_it[nb+i] = ft_malloc(200);
 		free_it[nb*2+i] = ft_malloc(500);
 	}
@@ -91,15 +91,9 @@ int		main(void)
 		//	free_it[i] = ft_realloc(free_it[i], 33);
 		//else
 			free_it[i] = ft_realloc(free_it[i], 1);
-		ft_putendl("after tiny");
-	ft_show_alloc_mem();
 		ft_memset(free_it[i], 12341, 1);
 		free_it[nb+i] = ft_realloc(free_it[nb+i], 50);
-		ft_putendl("after small");
-	ft_show_alloc_mem();
 		free_it[nb*2+i] = ft_realloc(free_it[nb*2+i], 201);
-		ft_putendl("after large");
-	ft_show_alloc_mem();
 	//ft_putendl("----------------------------------------------------");
 	//ft_show_alloc_mem();
 	}
@@ -114,9 +108,43 @@ int		main(void)
 	ft_putendl("AFTER FREES");
 	ft_show_alloc_mem();
 
+/*
+	int		nb = 10;
+	void	*free_it[nb];
+	ft_show_alloc_mem();
+	ft_putendl("BEFORE EVRYTHING");
+	for (int i = 0; i < nb; i++)
+		free_it[i] = ft_malloc(60);
+	ft_show_alloc_mem();
+	ft_putendl("AFTER MALLOCS");
+	for (int i = 0; i < nb; i++)
+	{
+		free_it[i] = ft_realloc(free_it[i], 58);
+	}
+	ft_show_alloc_mem();
+	ft_putendl("AFTER REALLOCS");
+	for (int i = 0; i < nb; i++)
+		ft_free(free_it[i]);
+	ft_show_alloc_mem();
+	ft_putendl("AFTER FREES");
+*/
+/*
+	void	*ptr[10];
 
-
-
+	ptr[0] = ft_malloc(20);
+	ptr[1] = ft_malloc(1);
+	ptr[2] = ft_malloc(1);
+	//ft_free(ptr[0]);
+	ft_free(ptr[1]);
+	ft_show_alloc_mem();
+	ptr[0] = ft_realloc(ptr[0], 21);
+	ft_putendl("AFTER REALLOC");
+	ft_show_alloc_mem();
+	ft_free(ptr[0]);
+	ft_free(ptr[1]);
+	ft_free(ptr[2]);
+	ft_show_alloc_mem();
+*/
 
 
 

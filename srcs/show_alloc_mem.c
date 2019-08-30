@@ -33,7 +33,6 @@ int    ft_print_clusters(t_cluster *cluster, void *limit)
         else if (cluster->freesize > 0)
             ft_putstr(" free\n");
         cluster = (void*)cluster + ft_abs(cluster->freesize);
-        //sleep(1);
     }
     return (cpt);
 }
