@@ -1,19 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init.c                                             :+:      :+:    :+:   */
+/*   calloc.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbleuse <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/21/08 13:54:05 by tbleuse           #+#    #+#             */
-/*   Updated: 2019/22/08 17:53:19 by tbleuse          ###   ########.fr       */
+/*   Updated: 2019/09/12 16:20:14 by tbleuse          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "liballoc.h"
 
-t_context	global_init()
+void *calloc(size_t nmemb, size_t size)
 {
-	t_context	ctx;
-	return ctx;
+    void        *ptr;
+
+    ptr = malloc(nmemb * size);
+    ft_bzero(ptr, nmemb * size);
+    return (ptr); 
 }

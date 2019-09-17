@@ -71,41 +71,39 @@ void		*ft_new_page(t_block **block, size_t size)
 	if (size <= SMALL)
 		new_cluster->freesize = new_block->size - BLOCKSIZE;
 	else
-		new_cluster->freesize = -1;
+		new_cluster->freesize = LARGE;
 	//write(1, "new page\n", 9);
 	return ((void*)new_cluster + CLUSTERSIZE);
 }
 
 void		*malloc(size_t size)
 {
-	ft_putnbr((int)size);
-	ft_blue(" malloc start\n");
+	//ft_putnbr((int)size);
+	//ft_blue(" malloc start\n");
 	void	*result;
 
-	result = NULL;
-	if (size != 0)
+	if (size == 0)
+		size = ALIGN;
+	if (size <= TINY)
 	{
-		if (size <= TINY)
-		{
-			if (!(result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE)))
-				if (ft_new_page(&g_alloc.tiny, TINY))
-					result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
-		}
-		else if (size <= SMALL)
-		{
-			//ft_putendl("alloc small");
-			if (!(result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE)))
-				if (ft_new_page(&g_alloc.small, SMALL))
-					result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE);
-		}
-		else
-			result = ft_new_page(&g_alloc.large, size);
+		if (!(result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE)))
+			if (ft_new_page(&g_alloc.tiny, TINY))
+				result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
 	}
-	ft_putaddr(result);
-	ft_putstr(" malloc end allocated: ");
-	ft_putnbr(-((t_cluster*)((void*)result - CLUSTERSIZE))->freesize);
-	ft_putstr(" - 16 = ");
-	ft_putnbr_n(-((t_cluster*)((void*)result - CLUSTERSIZE))->freesize - 16);
+	else if (size <= SMALL)
+	{
+		//ft_putendl("alloc small");
+		if (!(result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE)))
+			if (ft_new_page(&g_alloc.small, SMALL))
+				result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE);
+	}
+	else
+		result = ft_new_page(&g_alloc.large, size);
+	//ft_putaddr(result);
+	//ft_putstr(" malloc end allocated: ");
+	//ft_putnbr(-((t_cluster*)((void*)result - CLUSTERSIZE))->freesize);
+	//ft_putstr(" - 16 = ");
+	//ft_putnbr_n(-((t_cluster*)((void*)result - CLUSTERSIZE))->freesize - 16);
 	//show_alloc_mem();
 	return (result);
 }

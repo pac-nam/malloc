@@ -39,6 +39,8 @@ SRC	=	malloc.c			\
 		free.c				\
 		realloc.c			\
 		malloc_good_size.c	\
+		calloc.c			\
+		reallocf.c			\
 
 OBJ = $(addprefix $(OBJ_FOLDER)/, $(SRC:.c=.o))
 

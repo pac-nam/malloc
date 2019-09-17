@@ -1,20 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   malloc_good_size.c                                 :+:      :+:    :+:   */
+/*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbleuse <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/21/08 13:54:05 by tbleuse           #+#    #+#             */
-/*   Updated: 2019/09/12 16:20:14 by tbleuse          ###   ########.fr       */
+/*   Updated: 2019/22/08 17:53:19 by tbleuse          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "liballoc.h"
 
-size_t		malloc_good_size(size_t x)
+void    *reallocf(void *ptr, size_t size)
 {
-	if (x == 0)
-		return (ALIGN);
-	return ((x + ALIGN - 1) / ALIGN) * ALIGN;
+    t_cluster   *cluster;
+    t_block     *block;
+
+    ptr = realloc(ptr, size);
+    cluster = (t_cluster*)(ptr - CLUSTERSIZE);
+    block = (t_block*)(((void*)cluster) - BLOCKSIZE);
+    if ((cluster->freesize == LARGE
+    && block->size - BLOCKSIZE - CLUSTERSIZE != size)
+    || (cluster->freesize != LARGE
+    && (-cluster->freesize) - CLUSTERSIZE != size))
+    {
+        free(ptr);
+        ptr = NULL;
+    }
+    return (ptr);
 }

@@ -23,9 +23,9 @@ void    *ft_ugly_realloc(void *ptr, size_t size)
     cluster = (void*)ptr - CLUSTERSIZE;
     if (!(new_ptr = malloc(size)))
         return (NULL);
-    if (cluster->freesize == -1)
+    if (cluster->freesize == LARGE)
     {
-        ft_putendl("hello world");
+        //ft_putendl("hello world");
         largesize = ((t_block*)((void*)cluster - BLOCKSIZE))->size - BLOCKSIZE - CLUSTERSIZE;
         ft_memcpy(new_ptr, ptr, (largesize < size) ? largesize : size);
     }
@@ -70,16 +70,17 @@ void    *realloc_size(t_block* page, t_cluster *to_realloc, int size)
 
 void	*realloc(void *ptr, size_t size)
 {
-    ft_putaddr(ptr);
-	ft_yellow(" to realloc size ");
-    ft_putnbr_n(size);
+    //ft_putaddr(ptr);
+	//ft_yellow(" to realloc size ");
+    //ft_putnbr_n(size);
     t_cluster   *cluster;
     int         freesize;
     void        *to_return;
     t_block     *page;
 
-	size = malloc_good_size(size);
-    if (!ptr)
+    if (ptr && !size)
+        free(ptr);
+    if (!ptr || !(size = malloc_good_size(size)))
         to_return = malloc(size);
     else if (!(page = ft_get_malloc_page(ptr)))
         to_return = NULL;
@@ -89,7 +90,7 @@ void	*realloc(void *ptr, size_t size)
         freesize = ft_abs(cluster->freesize) - CLUSTERSIZE;
         if (cluster->freesize > 0)
             to_return = malloc(size);
-        else if (cluster->freesize == -1 && size > SMALL
+        else if (cluster->freesize == LARGE && size > SMALL
         && page->size == size + BLOCKSIZE + CLUSTERSIZE)
             return (ptr);
         else if (TINY < freesize && freesize <= SMALL && TINY < size && size <= SMALL)
@@ -98,12 +99,12 @@ void	*realloc(void *ptr, size_t size)
             to_return = realloc_size(page, cluster, size + CLUSTERSIZE);
         else
         {
-            ft_putendl("ugly realloc");
+            //ft_putendl("ugly realloc");
             to_return = ft_ugly_realloc(ptr, size);
         }
     }
-    ft_putaddr(to_return);
-	ft_putendl(" realloked");
+    //ft_putaddr(to_return);
+	//ft_putendl(" realloked");
     //show_alloc_mem();
     return (to_return);
 }

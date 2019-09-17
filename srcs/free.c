@@ -119,8 +119,8 @@ void    free_cluster(t_block **start, t_block *page, void *to_free)
 
 void	free(void *ptr)
 {
-    ft_putaddr(ptr);
-	ft_green(" to free\n");
+    //ft_putaddr(ptr);
+	//ft_green(" to free\n");
     t_block *page;
     t_cluster   *cluster;
 
@@ -129,7 +129,7 @@ void	free(void *ptr)
         cluster = ptr - CLUSTERSIZE;
         if (cluster->freesize > 0)
             ;
-        else if (cluster->freesize == -1)
+        else if (cluster->freesize == LARGE)
         {
             ft_free_page(&g_alloc.large, page);
         }
@@ -142,6 +142,6 @@ void	free(void *ptr)
             free_cluster(&g_alloc.small, page, cluster);
         }
     }
-	ft_putendl("free end");
+	//ft_putendl("free end");
     //show_alloc_mem();
 }

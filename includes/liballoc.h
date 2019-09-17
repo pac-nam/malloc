@@ -42,12 +42,16 @@ void	free(void *ptr);
 void	*malloc(size_t size);
 void	*realloc(void *ptr, size_t size);
 void	show_alloc_mem(void);
+void	*calloc(size_t nmemb, size_t size);
+void    *reallocf(void *ptr, size_t size);
+size_t	malloc_good_size(size_t x);
+
 t_block *ft_get_malloc_page(void *ptr);
 int     ft_check_ptr(t_block *page, void *to_find);
-size_t	malloc_good_size(size_t x);
 
 # define TINY	2048
 # define SMALL	1024*128
+# define LARGE	-1
 # define ALIGN	16
 # define PAGESIZE getpagesize()
 # define BLOCKSIZE malloc_good_size(sizeof(t_block))
