@@ -64,7 +64,7 @@ int    ft_print_pages(t_block *page)
     return (cpt);
 }
 
-void	ft_show_alloc_mem(void)
+void	show_alloc_mem(void)
 {
     t_block     *tmp_page;
     int         cpt;

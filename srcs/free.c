@@ -12,117 +12,136 @@
 
 #include "liballoc.h"
 
-void    ft_free_in_this_page(t_cluster *prev, t_cluster *to_remove)
+int         ft_check_ptr(t_block *page, void *to_find)
 {
     t_cluster   *cluster;
 
-    cluster = (void*)prev + ft_abs(prev->freesize);
-    if (to_remove == prev)
-    {
-        prev->freesize = -prev->freesize;
-        if (cluster->freesize > 0)
-            prev->freesize += cluster->freesize;
-        return ;
-    }
-    while (cluster < to_remove)
-    {
-        prev = cluster;
-        cluster = (void*)cluster + ft_abs(cluster->freesize);
-    }
-    cluster = (void*)cluster + ft_abs(cluster->freesize);
-    to_remove->freesize = -to_remove->freesize;
-    if (cluster->freesize > 0)
-        to_remove->freesize += cluster->freesize;
-    if (prev->freesize > 0)
-        prev->freesize += to_remove->freesize;
+    //ft_putendl("BALISE 1");
+    if (!page || !to_find)
+        return (0);
+    //ft_putendl("BALISE 2");
+    cluster = (t_cluster*)((void*)page + BLOCKSIZE);
+    while ((void*)cluster + CLUSTERSIZE < to_find)
+        cluster = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
+    //ft_putendl("BALISE 3");
+    if ((void*)cluster + CLUSTERSIZE == to_find)
+        return (1);
+    //ft_putendl("BALISE 4");
+    return (0);
 }
 
-void    ft_free_in_first_page(t_block **page, void *to_remove)
+t_block     *ft_get_malloc_page(void *ptr)
 {
-    t_cluster   *cluster;
-    t_block     *current;
+    t_block     *tmp;
 
-    ft_free_in_this_page((void*)*page + BLOCKSIZE, to_remove);
-    cluster = (t_cluster*)((void*)(*page) + BLOCKSIZE);
-    if (cluster->freesize == (int)((*page)->size - BLOCKSIZE))
-    {
-        current = *page;
-        *page = (*page)->next;
-        munmap(current, current->size);
-    }
+    if (!ptr)
+        return (NULL);
+    tmp = g_alloc.tiny;
+    while (tmp)
+        if ((void*)tmp < ptr && ptr < (void*)tmp + tmp->size
+        && ft_check_ptr(tmp, ptr))
+            return(tmp);
+        else 
+            tmp = tmp->next;
+    tmp = g_alloc.small;
+    while (tmp)
+        if ((void*)tmp < ptr && ptr < (void*)tmp + tmp->size
+        && ft_check_ptr(tmp, ptr))
+            return(tmp);
+        else 
+            tmp = tmp->next;
+    tmp = g_alloc.large;
+    while (tmp)
+        if ((void*)tmp + BLOCKSIZE + CLUSTERSIZE == ptr)
+            return(tmp);
+        else
+            tmp = tmp->next;
+    return (NULL);
 }
 
-void    ft_free_size(t_block **page, void *to_remove)
-{
-    t_block     *prev;
-    t_block     *current;
-    t_cluster   *cluster;
-
-    prev = *page;
-    if ((void*)prev < to_remove && to_remove <= (void*)prev + prev->size)
-        ft_free_in_first_page(page, to_remove);
-    else
-    {
-        while ((current = prev->next))
-        {
-            if ((void*)current < to_remove
-            && to_remove <= (void*)current + current->size)
-            {
-                ft_free_in_this_page((void*)current + BLOCKSIZE, to_remove);
-                cluster = (t_cluster*)((void*)current + BLOCKSIZE);
-                if (cluster->freesize == (int)(current->size - BLOCKSIZE))
-                {
-                    prev->next = current->next;
-                    munmap(current, current->size);
-                }
-                return ;
-            }
-            prev = current;
-        }
-    }
-}
-
-void    ft_free_large(t_block  *ptr)
+void    ft_free_page(t_block  **start, t_block *to_free)
 {
     t_block    *tmp;
 
-    if (ptr == g_alloc.large)
+    if (to_free == *start)
     {
-        //ft_putendl("first to remove");
-        g_alloc.large = g_alloc.large->next;
-        munmap(ptr, ptr->size);
+        *start = to_free->next;
+        munmap(to_free, to_free->size);
         return ;
     }
-    tmp = g_alloc.large;
+    tmp = *start;
     while (tmp->next)
     {
-        //printf("\nptr: %p\n", ptr);
-        //printf("tmp: %p\n", tmp);
-        if (tmp->next == ptr)
+        if (tmp->next == to_free)
         {
             tmp->next = tmp->next->next;
-            munmap(ptr, ptr->size);
+            munmap(to_free, to_free->size);
             return ;
         }
         tmp = tmp->next;
     }
 }
 
-void	ft_free(void *ptr)
+void    free_cluster(t_block **start, t_block *page, void *to_free)
 {
     t_cluster   *cluster;
+    t_cluster   *cluster_next;
+    t_cluster   *cluster_next2;
 
-    if (!ptr)
-        return ;
-    cluster = ptr - CLUSTERSIZE;
-    //printf("ptr to free: %p\n", ptr);
-    //printf("to free size: %d\n", cluster->freesize);
-    if (cluster->freesize > 0)
-        return ;
-    else if (cluster->freesize == -1)
-        ft_free_large((t_block*)cluster - 1);
-    else if (-cluster->freesize - CLUSTERSIZE <= TINY)
-        ft_free_size(&g_alloc.tiny, cluster);
-    else if (-cluster->freesize - CLUSTERSIZE <= SMALL)
-        ft_free_size(&g_alloc.small, cluster);
+    cluster = (void*)page + BLOCKSIZE;
+    cluster_next = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
+    if ((void*)cluster == to_free)
+    {
+        cluster->freesize = -cluster->freesize;
+        if (cluster_next->freesize > 0)
+            cluster->freesize += cluster_next->freesize;
+    }
+    else
+    {
+        while ((void*)cluster_next < (void*)page + page->size)
+        {
+            if ((void*)cluster_next == to_free)
+            {
+                cluster_next->freesize = -cluster_next->freesize;
+                cluster_next2 = (t_cluster*)((void*)cluster_next + cluster_next->freesize);
+                if (cluster_next2->freesize > 0)
+                    cluster_next->freesize += cluster_next2->freesize;
+                if (cluster->freesize > 0)
+                    cluster->freesize += cluster_next->freesize;
+            }
+            cluster = cluster_next;
+            cluster_next = (t_cluster*)((void*)cluster_next + ft_abs(cluster_next->freesize));
+        }
+    }
+    if (((t_cluster*)((void*)page + BLOCKSIZE))->freesize == (int)(page->size - BLOCKSIZE))
+        ft_free_page(start, page);
+}
+
+void	free(void *ptr)
+{
+    ft_putaddr(ptr);
+	ft_green(" to free\n");
+    t_block *page;
+    t_cluster   *cluster;
+
+    if ((page = ft_get_malloc_page(ptr)))
+    {
+        cluster = ptr - CLUSTERSIZE;
+        if (cluster->freesize > 0)
+            ;
+        else if (cluster->freesize == -1)
+        {
+            ft_free_page(&g_alloc.large, page);
+        }
+        else if (-cluster->freesize - CLUSTERSIZE <= TINY)
+        {
+            free_cluster(&g_alloc.tiny, page, cluster);
+        }
+        else if (-cluster->freesize - CLUSTERSIZE <= SMALL)
+        {
+            free_cluster(&g_alloc.small, page, cluster);
+        }
+    }
+	ft_putendl("free end");
+    //show_alloc_mem();
 }

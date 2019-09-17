@@ -18,15 +18,9 @@
 # include <unistd.h>
 # include "../libft/includes/libft.h"
 
-void	ft_free(void *ptr);
-void	*ft_malloc(size_t size);
-void	*ft_realloc(void *ptr, size_t size);
-void	ft_show_alloc_mem(void);
-size_t	ft_align(size_t x);
-
 typedef	struct			s_cluster
 {
-	short				freesize;
+	int				freesize;
 }						t_cluster;
 
 typedef struct 			s_block
@@ -44,12 +38,20 @@ typedef struct			s_context
 
 t_context				g_alloc;
 
-# define TINY	64
-# define SMALL	256
-# define ALIGN	1
+void	free(void *ptr);
+void	*malloc(size_t size);
+void	*realloc(void *ptr, size_t size);
+void	show_alloc_mem(void);
+t_block *ft_get_malloc_page(void *ptr);
+int     ft_check_ptr(t_block *page, void *to_find);
+size_t	malloc_good_size(size_t x);
+
+# define TINY	2048
+# define SMALL	1024*128
+# define ALIGN	16
 # define PAGESIZE getpagesize()
-# define BLOCKSIZE ft_align(sizeof(t_block))
-# define CLUSTERSIZE ft_align(sizeof(t_cluster))
+# define BLOCKSIZE malloc_good_size(sizeof(t_block))
+# define CLUSTERSIZE malloc_good_size(sizeof(t_cluster))
 
 #endif
 

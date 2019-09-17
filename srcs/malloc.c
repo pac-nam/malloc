@@ -6,23 +6,19 @@
 /*   By: tbleuse <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/21/08 13:54:05 by tbleuse           #+#    #+#             */
-/*   Updated: 2019/22/08 17:53:19 by tbleuse          ###   ########.fr       */
+/*   Updated: 2019/09/12 16:20:14 by tbleuse          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "liballoc.h"
 
-size_t		ft_align(size_t x)
-{
-	return ((x + ALIGN - 1) / ALIGN) * ALIGN;
-}
-
 void		*ft_find_cluster(t_block *block, int size)
 {
+	//write(1, "find cluster\n", 13);
 	t_block		*tmp_block;
 	t_cluster	*cluster;
 
-	size = ft_align(size);
+	size = malloc_good_size(size);
 	//printf("BALISE1 %d\n", size);
 	tmp_block = block;
 	while (tmp_block)
@@ -30,28 +26,24 @@ void		*ft_find_cluster(t_block *block, int size)
 		cluster = (void*)tmp_block + BLOCKSIZE;
 		while ((void*)cluster < (void*)tmp_block + tmp_block->size)
 		{
-			//printf("cluster->freesize %d\n", cluster->freesize);
-			//printf("size %d\n", size);
+			//sleep(1);
 			if (cluster->freesize >= size + (int)CLUSTERSIZE
 			|| cluster->freesize == size)
 			{
-				ft_bzero((void*)cluster + CLUSTERSIZE, size - CLUSTERSIZE);
+				//ft_bzero((void*)cluster + CLUSTERSIZE, size - CLUSTERSIZE);
 				if (cluster->freesize >= size + (int)CLUSTERSIZE)
 					((t_cluster*)((void*)cluster + size))->freesize
 					= cluster->freesize - size;
 				cluster->freesize = -size;
-				//printf("\ncluster %p freesize %d\n", cluster, cluster->freesize);
-				//printf("new cluster %p\n", new_cluster);
-				//printf("return   %p\n\n", (void*)cluster + CLUSTERSIZE);
 				return ((void*)cluster + CLUSTERSIZE);
 			}
 			cluster = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
-			//printf("cluster %p freesize %d\n", cluster, cluster->freesize);
 			//sleep(1);
 		}
 		tmp_block = tmp_block->next;
 	}
 	//ft_putendl("space not found");
+	//write(1, "no space\n", 9);
 	return (NULL);
 }
 
@@ -80,34 +72,40 @@ void		*ft_new_page(t_block **block, size_t size)
 		new_cluster->freesize = new_block->size - BLOCKSIZE;
 	else
 		new_cluster->freesize = -1;
-	//printf("new_block %p\n", new_block);
-	//printf("first ptr: %p\n", (void*)new_cluster + CLUSTERSIZE);
+	//write(1, "new page\n", 9);
 	return ((void*)new_cluster + CLUSTERSIZE);
 }
 
-void		*ft_malloc(size_t size)
+void		*malloc(size_t size)
 {
+	ft_putnbr((int)size);
+	ft_blue(" malloc start\n");
 	void	*result;
 
 	result = NULL;
-	//printf("new malloc size %ld\n", size);
-	if (size == 0)
-		return (NULL);
-	if (size <= TINY)
+	if (size != 0)
 	{
-		if (!(result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE)))
-			if (ft_new_page(&g_alloc.tiny, TINY))
-				result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
+		if (size <= TINY)
+		{
+			if (!(result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE)))
+				if (ft_new_page(&g_alloc.tiny, TINY))
+					result = ft_find_cluster(g_alloc.tiny, size + CLUSTERSIZE);
+		}
+		else if (size <= SMALL)
+		{
+			//ft_putendl("alloc small");
+			if (!(result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE)))
+				if (ft_new_page(&g_alloc.small, SMALL))
+					result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE);
+		}
+		else
+			result = ft_new_page(&g_alloc.large, size);
 	}
-	else if (size <= SMALL)
-	{
-		//printf("alloc small %ld\n", size);
-		if (!(result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE)))
-			if (ft_new_page(&g_alloc.small, SMALL))
-				result = ft_find_cluster(g_alloc.small, size + CLUSTERSIZE);
-	}
-	else
-		result = ft_new_page(&g_alloc.large, size);
-	//printf("malloc end\n");
+	ft_putaddr(result);
+	ft_putstr(" malloc end allocated: ");
+	ft_putnbr(-((t_cluster*)((void*)result - CLUSTERSIZE))->freesize);
+	ft_putstr(" - 16 = ");
+	ft_putnbr_n(-((t_cluster*)((void*)result - CLUSTERSIZE))->freesize - 16);
+	//show_alloc_mem();
 	return (result);
 }
