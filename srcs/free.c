@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+///* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
@@ -89,7 +89,7 @@ void    free_cluster(t_block **start, t_block *page, void *to_free)
     t_cluster   *cluster_next2;
 
     cluster = (void*)page + BLOCKSIZE;
-    cluster_next = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
+    cluster_next = (t_cluster*)(((void*)cluster) + ft_abs(cluster->freesize));
     if ((void*)cluster == to_free)
     {
         cluster->freesize = -cluster->freesize;
@@ -100,17 +100,28 @@ void    free_cluster(t_block **start, t_block *page, void *to_free)
     {
         while ((void*)cluster_next < (void*)page + page->size)
         {
+            //ft_putstr("F");
             if ((void*)cluster_next == to_free)
             {
-                cluster_next->freesize = -cluster_next->freesize;
-                cluster_next2 = (t_cluster*)((void*)cluster_next + cluster_next->freesize);
+                cluster_next->freesize = ft_abs(cluster_next->freesize);
+                cluster_next2 = (t_cluster*)(((void*)cluster_next) + cluster_next->freesize);
                 if (cluster_next2->freesize > 0)
                     cluster_next->freesize += cluster_next2->freesize;
                 if (cluster->freesize > 0)
                     cluster->freesize += cluster_next->freesize;
             }
+            //if (cluster == cluster_next)
+            //{
+			//	ft_putaddr(cluster);
+			//	ft_putstr("cluster size: ");
+            //    ft_putnbr_n(cluster->freesize);
+			//	ft_putstr("to free: ");
+			//	ft_putaddr(to_free);
+            //    ft_putchar('\n');
+			//	exit(1);
+            //}
             cluster = cluster_next;
-            cluster_next = (t_cluster*)((void*)cluster_next + ft_abs(cluster_next->freesize));
+            cluster_next = (t_cluster*)(((void*)cluster_next) + ft_abs(cluster_next->freesize));
         }
     }
     if (((t_cluster*)((void*)page + BLOCKSIZE))->freesize == (int)(page->size - BLOCKSIZE))

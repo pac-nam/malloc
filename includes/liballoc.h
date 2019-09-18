@@ -44,7 +44,7 @@ void	*realloc(void *ptr, size_t size);
 void	show_alloc_mem(void);
 void	*calloc(size_t nmemb, size_t size);
 void    *reallocf(void *ptr, size_t size);
-size_t	malloc_good_size(size_t x);
+size_t	malloc_good_size(size_t size);
 
 t_block *ft_get_malloc_page(void *ptr);
 int     ft_check_ptr(t_block *page, void *to_find);
