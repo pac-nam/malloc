@@ -20,10 +20,10 @@
 
 typedef	struct			s_cluster
 {
-	int				freesize;
+	int					freesize;
 }						t_cluster;
 
-typedef struct 			s_block
+typedef	struct			s_block
 {
 	size_t				size;
 	struct s_block		*next;
@@ -38,17 +38,17 @@ typedef struct			s_context
 
 t_context				g_alloc;
 
-void	free(void *ptr);
-void	*malloc(size_t size);
-void	*realloc(void *ptr, size_t size);
-void	show_alloc_mem(void);
-void	*calloc(size_t nmemb, size_t size);
-void    *reallocf(void *ptr, size_t size);
-size_t	malloc_good_size(size_t size);
-size_t	malloc_size(void *ptr);
+void					free(void *ptr);
+void					*malloc(size_t size);
+void					*realloc(void *ptr, size_t size);
+void					show_alloc_mem(void);
+void					*calloc(size_t nmemb, size_t size);
+void					*reallocf(void *ptr, size_t size);
+size_t					malloc_good_size(size_t size);
+size_t					malloc_size(void *ptr);
 
-t_block *ft_get_malloc_page(void *ptr);
-int     ft_check_ptr(t_block *page, void *to_find);
+t_block					*ft_get_malloc_page(void *ptr);
+int						ft_check_ptr(t_block *page, void *to_find);
 
 # define TINY	2048
 # define SMALL	1024*128
@@ -57,7 +57,6 @@ int     ft_check_ptr(t_block *page, void *to_find);
 # define PAGESIZE getpagesize()
 # define BLOCKSIZE malloc_good_size(sizeof(t_block))
 # define CLUSTERSIZE malloc_good_size(sizeof(t_cluster))
+# define CS CLUSTERSIZE
 
 #endif
-
-#include <stdio.h>

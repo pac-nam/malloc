@@ -12,9 +12,9 @@
 
 #include "liballoc.h"
 
-int    ft_print_clusters(t_cluster *cluster, void *limit)
+int				ft_print_clusters(t_cluster *cluster, void *limit)
 {
-	int     cpt;
+	int			cpt;
 
 	cpt = 0;
 	while ((void*)cluster < (void*)limit)
@@ -37,11 +37,11 @@ int    ft_print_clusters(t_cluster *cluster, void *limit)
 	return (cpt);
 }
 
-int    ft_print_pages(t_block *page)
+int				ft_print_pages(t_block *page)
 {
-	int         page_number;
-	int         cpt;
-	t_block     *tmp_page;
+	int			page_number;
+	int			cpt;
+	t_block		*tmp_page;
 
 	page_number = 0;
 	cpt = 0;
@@ -64,10 +64,10 @@ int    ft_print_pages(t_block *page)
 	return (cpt);
 }
 
-void	show_alloc_mem(void)
+void			show_alloc_mem(void)
 {
-	t_block     *tmp_page;
-	int         cpt;
+	t_block		*tmp_page;
+	int			cpt;
 
 	cpt = 0;
 	ft_magenta("TINY:");

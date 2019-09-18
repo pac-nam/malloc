@@ -12,14 +12,14 @@
 
 #include "liballoc.h"
 
-size_t		malloc_good_size(size_t x)
+size_t			malloc_good_size(size_t x)
 {
 	if (x == 0)
 		return (ALIGN);
-	return ((x + ALIGN - 1) / ALIGN) * ALIGN;
+	return (((x + ALIGN - 1) / ALIGN) * ALIGN);
 }
 
-size_t		malloc_size(void *ptr)
+size_t			malloc_size(void *ptr)
 {
 	t_block		*page;
 	t_cluster	*cluster;
@@ -28,7 +28,7 @@ size_t		malloc_size(void *ptr)
 	{
 		cluster = (t_cluster*)(ptr - CLUSTERSIZE);
 		if (cluster->freesize == LARGE)
-			return (page->size - BLOCKSIZE - CLUSTERSIZE)
+			return (page->size - BLOCKSIZE - CLUSTERSIZE);
 		return ((size_t)(ft_abs(cluster->freesize) - CLUSTERSIZE));
 	}
 	return (0);

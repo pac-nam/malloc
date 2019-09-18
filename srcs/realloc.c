@@ -1,4 +1,4 @@
-///* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   realloc.c                                          :+:      :+:    :+:   */
@@ -10,13 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "liballoc.h"
+#include "liballoc.h"
 
-void    *ft_ugly_realloc(void *ptr, size_t size)
+void			*ft_ugly_realloc(void *ptr, size_t size)
 {
-	t_cluster   *cluster;
-	void        *new_ptr;
-	size_t      largesize;
+	t_cluster	*cluster;
+	void		*new_ptr;
+	size_t		largesize;
 
 	if (!ft_check_ptr(ft_get_malloc_page(ptr), ptr))
 		return (NULL);
@@ -25,84 +25,71 @@ void    *ft_ugly_realloc(void *ptr, size_t size)
 		return (NULL);
 	if (cluster->freesize == LARGE)
 	{
-		largesize = ((t_block*)((void*)cluster - BLOCKSIZE))->size - BLOCKSIZE - CLUSTERSIZE;
+		largesize = ((t_block*)((void*)cluster - BLOCKSIZE))->size
+		- BLOCKSIZE - CLUSTERSIZE;
 		ft_memcpy(new_ptr, ptr, (largesize < size) ? largesize : size);
 	}
 	else
-		ft_memcpy(new_ptr, ptr, (ft_abs(cluster->freesize) - CLUSTERSIZE < size)
+		ft_memcpy(new_ptr, ptr,
+		(ft_abs(cluster->freesize) - CLUSTERSIZE < size)
 		? ft_abs(cluster->freesize) - CLUSTERSIZE : size);
 	free(ptr);
 	return (new_ptr);
 }
 
-void    *realloc_size(t_block* page, t_cluster *to_realloc, int size)
+void			*realloc_size(t_block *page, t_cluster *to_realloc, int size)
 {
-	t_cluster   *old_next;
-	t_cluster   *new_next;
-	t_cluster   *cluster;
+	t_cluster	*c[3];
 
 	if (-to_realloc->freesize == size)
-	{
 		return ((void*)to_realloc + CLUSTERSIZE);
-	}
-	cluster = (t_cluster*)((void*)page + BLOCKSIZE);
-	while (cluster < to_realloc)
-		cluster = (void*)cluster + ft_abs(cluster->freesize);
-	if (cluster != to_realloc)
+	c[0] = (t_cluster*)((void*)page + BLOCKSIZE);
+	while (c[0] < to_realloc)
+		c[0] = (void*)c[0] + ft_abs(c[0]->freesize);
+	if (c[0] != to_realloc)
 		return (NULL);
-	old_next = (t_cluster*)((void*)cluster + ft_abs(cluster->freesize));
-	new_next = (t_cluster*)((void*)cluster + size);
-	if (size < -cluster->freesize)
+	c[1] = (t_cluster*)((void*)c[0] + ft_abs(c[0]->freesize));
+	c[2] = (t_cluster*)((void*)c[0] + size);
+	if (size < -c[0]->freesize)
 	{
-		new_next->freesize = (-cluster->freesize) - size;
-		cluster->freesize = -size;
+		c[2]->freesize = (-c[0]->freesize) - size;
+		c[0]->freesize = -size;
 	}
-	else if (size > -cluster->freesize)
+	if ((int)((-c[0]->freesize) + c[1]->freesize) > size)
 	{
-		if ((int)((-cluster->freesize) + old_next->freesize) > size)
-		{
-			if ((int)((-cluster->freesize) + old_next->freesize) != size)
-				new_next->freesize = ((-cluster->freesize) + old_next->freesize) - size;
-			cluster->freesize = -size;
-			old_next->freesize = 0;
-		}
-		else
-			return (ft_ugly_realloc(((void*)to_realloc) + CLUSTERSIZE, size - CLUSTERSIZE));
+		if ((int)((-c[0]->freesize) + c[1]->freesize) != size)
+			c[2]->freesize = ((-c[0]->freesize) + c[1]->freesize) - size;
+		c[0]->freesize = -size;
 	}
-	return ((void*)cluster + CLUSTERSIZE);
+	else
+		return (ft_ugly_realloc(((void*)to_realloc) + CS, size - CS));
+	return ((void*)c[0] + CLUSTERSIZE);
 }
 
-void	*realloc(void *ptr, size_t size)
+void			*realloc(void *ptr, size_t size)
 {
-	t_cluster   *cluster;
-	int         freesize;
-	void        *to_return;
-	t_block     *page;
+	t_cluster	*cluster;
+	int			freesize;
+	t_block		*page;
 
-	to_return = NULL;
-	if (!ptr || (ptr && !size))
-	{
-		to_return = malloc(malloc_good_size(size));
+	if (!size)
 		free(ptr);
-	}
-	else if ((page = ft_get_malloc_page(ptr)))
-	{
-		size = malloc_good_size(size);
-		cluster = (t_cluster*)(ptr - CLUSTERSIZE);
-		freesize = ft_abs(cluster->freesize) - CLUSTERSIZE;
-		if (cluster->freesize > 0)
-			to_return = malloc(size);
-		else if (cluster->freesize == LARGE && size > SMALL
-		&& page->size == size + BLOCKSIZE + CLUSTERSIZE)
-			return (ptr);
-		else if (TINY < freesize && freesize <= SMALL && TINY < size && size <= SMALL)
-			to_return = realloc_size(page, cluster, size + CLUSTERSIZE);
-		else if (freesize <= TINY && size <= TINY)
-			to_return = realloc_size(page, cluster, size + CLUSTERSIZE);
-		else
-		{
-			to_return = ft_ugly_realloc(ptr, size);
-		}
-	}
-	return (to_return);
+	if (!ptr || (ptr && !size))
+		return (malloc(malloc_good_size(size)));
+	if (!(page = ft_get_malloc_page(ptr)))
+		return (NULL);
+	size = malloc_good_size(size);
+	cluster = (t_cluster*)(ptr - CLUSTERSIZE);
+	freesize = ft_abs(cluster->freesize) - CLUSTERSIZE;
+	if (cluster->freesize > 0)
+		return (malloc(size));
+	else if (cluster->freesize == LARGE && size > SMALL
+	&& page->size == size + BLOCKSIZE + CLUSTERSIZE)
+		return (ptr);
+	else if (TINY < freesize && freesize <= SMALL
+	&& TINY < size && size <= SMALL)
+		return (realloc_size(page, cluster, size + CLUSTERSIZE));
+	else if (freesize <= TINY && size <= TINY)
+		return (realloc_size(page, cluster, size + CLUSTERSIZE));
+	return (ft_ugly_realloc(ptr, size));
 }

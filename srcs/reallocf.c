@@ -12,11 +12,11 @@
 
 #include "liballoc.h"
 
-void    *reallocf(void *ptr, size_t size)
+void			*reallocf(void *ptr, size_t size)
 {
-	t_cluster   *cluster;
-	t_block     *block;
-	void        *new;
+	t_cluster	*cluster;
+	t_block		*block;
+	void		*new;
 
 	if (!(new = realloc(ptr, size)))
 	{

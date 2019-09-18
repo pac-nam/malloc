@@ -27,7 +27,7 @@ LIB			=	libft.a
 ####### C FILE BY FOLDER ######
 ###############################
 
-SRC     =		malloc.c free.c realloc.c calloc.c show_alloc_mem.c reallocf.c
+SRC     =		malloc.c free.c realloc.c calloc.c show_alloc_mem.c reallocf.c malloc_good_size.c
 ###############################
 ######### ADD PREFIX ##########
 ###### ALL SRC/OBJ FILE #######

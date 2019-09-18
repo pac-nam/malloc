@@ -12,7 +12,7 @@
 
 #include "liballoc.h"
 
-void		*ft_find_cluster(t_block *page, int size)
+void			*ft_find_cluster(t_block *page, int size)
 {
 	t_cluster	*cluster;
 
@@ -25,8 +25,8 @@ void		*ft_find_cluster(t_block *page, int size)
 			if (cluster->freesize >= size + (int)CLUSTERSIZE)
 			{
 				if (cluster->freesize >= size + (int)CLUSTERSIZE)
-					((t_cluster*)((void*)cluster + size))->freesize
-					= cluster->freesize - size;
+					((t_cluster*)((void*)cluster + size))->freesize =
+					cluster->freesize - size;
 				cluster->freesize = -size;
 				return ((void*)cluster + CLUSTERSIZE);
 			}
@@ -37,15 +37,15 @@ void		*ft_find_cluster(t_block *page, int size)
 	return (NULL);
 }
 
-void		*ft_new_page(t_block **block, size_t size)
+void			*ft_new_page(t_block **block, size_t size)
 {
 	size_t		alloc_length;
 	t_block		*new_block;
 	t_cluster	*new_cluster;
 
 	alloc_length = PAGESIZE;
-	while ((size <= TINY && alloc_length < (TINY + CLUSTERSIZE) * 100 + BLOCKSIZE)
-	|| (size <= SMALL && alloc_length < (SMALL + CLUSTERSIZE) * 100 + BLOCKSIZE))
+	while ((size <= TINY && alloc_length < (TINY + CS) * 100 + BLOCKSIZE)
+	|| (size <= SMALL && alloc_length < (SMALL + CS) * 100 + BLOCKSIZE))
 		alloc_length += PAGESIZE;
 	if (SMALL < size)
 		alloc_length = size + CLUSTERSIZE + BLOCKSIZE;
@@ -63,9 +63,9 @@ void		*ft_new_page(t_block **block, size_t size)
 	return (((void*)new_cluster) + CLUSTERSIZE);
 }
 
-void		*malloc(size_t size)
+void			*malloc(size_t size)
 {
-	void	*result;
+	void		*result;
 
 	size = malloc_good_size(size);
 	if (size <= TINY)

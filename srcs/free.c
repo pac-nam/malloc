@@ -12,9 +12,9 @@
 
 #include "liballoc.h"
 
-int		 ft_check_ptr(t_block *page, void *to_find)
+int				ft_check_ptr(t_block *page, void *to_find)
 {
-	t_cluster   *cluster;
+	t_cluster	*cluster;
 
 	if (!page || !to_find)
 		return (0);
@@ -26,9 +26,9 @@ int		 ft_check_ptr(t_block *page, void *to_find)
 	return (0);
 }
 
-t_block	 *ft_get_malloc_page(void *ptr)
+t_block			*ft_get_malloc_page(void *ptr)
 {
-	t_block	 *tmp;
+	t_block		*tmp;
 
 	if (!ptr)
 		return (NULL);
@@ -36,28 +36,28 @@ t_block	 *ft_get_malloc_page(void *ptr)
 	while (tmp)
 		if ((void*)tmp < ptr && ptr < (void*)tmp + tmp->size
 		&& ft_check_ptr(tmp, ptr))
-			return(tmp);
-		else 
+			return (tmp);
+		else
 			tmp = tmp->next;
 	tmp = g_alloc.small;
 	while (tmp)
 		if ((void*)tmp < ptr && ptr < (void*)tmp + tmp->size
 		&& ft_check_ptr(tmp, ptr))
-			return(tmp);
-		else 
+			return (tmp);
+		else
 			tmp = tmp->next;
 	tmp = g_alloc.large;
 	while (tmp)
 		if ((void*)tmp + BLOCKSIZE + CLUSTERSIZE == ptr)
-			return(tmp);
+			return (tmp);
 		else
 			tmp = tmp->next;
 	return (NULL);
 }
 
-void	ft_free_page(t_block  **start, t_block *to_free)
+void			ft_free_page(t_block **start, t_block *to_free)
 {
-	t_block	*tmp;
+	t_block		*tmp;
 
 	if (to_free == *start)
 	{
@@ -78,45 +78,39 @@ void	ft_free_page(t_block  **start, t_block *to_free)
 	}
 }
 
-void    free_cluster(t_block **start, t_block *page, void *to_free)
+void			free_cluster(t_block **start, t_block *page, void *to_free)
 {
-	t_cluster   *cluster;
-	t_cluster   *cluster_next;
-	t_cluster   *cluster_next2;
+	t_cluster	*c[3];
 
-	cluster = (void*)page + BLOCKSIZE;
-	cluster_next = (t_cluster*)(((void*)cluster) + ft_abs(cluster->freesize));
-	if ((void*)cluster == to_free)
+	c[0] = (void*)page + BLOCKSIZE;
+	c[1] = (t_cluster*)(((void*)c[0]) + ft_abs(c[0]->freesize));
+	if ((void*)c[0] == to_free)
 	{
-		cluster->freesize = -cluster->freesize;
-		if (cluster_next->freesize > 0)
-			cluster->freesize += cluster_next->freesize;
+		c[0]->freesize = -c[0]->freesize;
+		c[0]->freesize += (c[1]->freesize > 0) ? c[1]->freesize : 0;
 	}
 	else
-	{
-		while ((void*)cluster_next < (void*)page + page->size)
+		while ((void*)c[1] < (void*)page + page->size)
 		{
-			if ((void*)cluster_next == to_free)
+			if ((void*)c[1] == to_free)
 			{
-				cluster_next->freesize = ft_abs(cluster_next->freesize);
-				cluster_next2 = (t_cluster*)(((void*)cluster_next) + cluster_next->freesize);
-				if (cluster_next2->freesize > 0)
-					cluster_next->freesize += cluster_next2->freesize;
-				if (cluster->freesize > 0)
-					cluster->freesize += cluster_next->freesize;
+				c[1]->freesize = ft_abs(c[1]->freesize);
+				c[2] = (t_cluster*)(((void*)c[1]) + c[1]->freesize);
+				c[1]->freesize += (c[2]->freesize > 0) ? c[2]->freesize : 0;
+				c[0]->freesize += (c[0]->freesize > 0) ? c[1]->freesize : 0;
 			}
-			cluster = cluster_next;
-			cluster_next = (t_cluster*)(((void*)cluster_next) + ft_abs(cluster_next->freesize));
+			c[0] = c[1];
+			c[1] = (t_cluster*)(((void*)c[1]) + ft_abs(c[1]->freesize));
 		}
-	}
-	if (((t_cluster*)((void*)page + BLOCKSIZE))->freesize == (int)(page->size - BLOCKSIZE))
+	if (((t_cluster*)((void*)page + BLOCKSIZE))->freesize ==
+	(int)(page->size - BLOCKSIZE))
 		ft_free_page(start, page);
 }
 
-void	free(void *ptr)
+void			free(void *ptr)
 {
-	t_block	 *page;
-	t_cluster   *cluster;
+	t_block		*page;
+	t_cluster	*cluster;
 
 	if ((page = ft_get_malloc_page(ptr)))
 	{
