@@ -1,88 +1,84 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: tbleuse <marvin@42.fr>                     +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2017/11/08 10:34:52 by tbleuse           #+#    #+#              #
-#    Updated: 2019/09/12 16:14:23 by tbleuse          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+NAME = libft_malloc_$(HOSTTYPE).so
+SHORTNAME = libft_malloc.so
 
 ifeq ($(HOSTTYPE),)
-	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
+    HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
-NAME = libft_malloc_$(HOSTTYPE)
+###############################
+####### GLOBAL VARIABLE #######
+###############################
+RED 		= 	\x1b[31m
+YELLOW	 	= 	\x1b[33m
+GREEN 		= 	\x1b[32m
+RESET 		= 	\x1b[0m
+SRCSDIR 	= 	srcs
+OBJSDIR 	= 	objects
+INCLUDES 	= 	includes
+DEBUG		=	-g3
+CFLAGS 		=  	-Wall -Werror -Wextra -Wpadded
+CC 			= 	gcc $(CFLAGS) $(DEBUG)
+HEADER		=	liballoc.h
+HEADERS		=	$(addprefix $(INCLUDES)/, $(HEADER))
+LIBDIR		=	libft
+LIB			=	libft.a
+###############################
+######## CREATE FOLDER ########
+####### C FILE BY FOLDER ######
+###############################
 
-LINK = libft_malloc.so
+SRC     =		malloc.c free.c realloc.c calloc.c show_alloc_mem.c reallocf.c
+###############################
+######### ADD PREFIX ##########
+###### ALL SRC/OBJ FILE #######
+###############################
 
-CC = gcc
+OBJ 		= 	$(SRC:%.c=%.o)
 
-FLAGS = -Wall -Wextra -Werror -g3
+SRCS 		= 	$(addprefix $(SRCSDIR)/, $(SRC))
+OBJS 		= 	$(addprefix $(OBJSDIR)/, $(OBJ))
 
-LIBFT = libft
+all: $(NAME)
 
-LIB = $(LIBFT)/$(LIBFT).a
+$(NAME): $(LIBDIR)/$(LIB) $(OBJSDIR) $(OBJS)
+	@printf "Compiling $(NAME)${RESET}"
+	@$(CC) -shared -o $(NAME) $(OBJS) $(LIBDIR)/$(LIB)
+	@rm -rf libft_malloc.so
+	@ln -s $(NAME) libft_malloc.so
+	@echo " done [${GREEN}✔${RESET}]"
 
-SRC_FOLDER = srcs
+compile:
+	@gcc tests/test0.c  -Iincludes/ -o tests/test0
+	@gcc tests/test1.c -Iincludes/ -o tests/test1
+	@gcc tests/test2.c -Iincludes/ -o tests/test2
+	@gcc tests/test3.c -Iincludes/ -o tests/test3
+	@gcc tests/test3++.c -Iincludes/ -o tests/test3++
+	@gcc tests/test4.c -Iincludes/ -o tests/test4
+	@gcc tests/test5.c -Iincludes/ -L. -lft_malloc -o tests/test5
+	@echo "${RED}Compiling tests ${RESET} [${GREEN}✔${RESET}]"
 
-INCLUDE_FOLDER = includes
+$(OBJSDIR)/%.o: $(SRCSDIR)/%.c $(HEADERS)
+	@$(CC) -c -o $@ $< -I$(INCLUDES)
 
-OBJ_FOLDER = objs
+$(LIBDIR)/$(LIB):
+	make -C $(LIBDIR)
 
-TESTFILE = main_test.c
+$(OBJSDIR):
+	@mkdir -p $(OBJSDIR)/$(DIRCORE)
 
-SRC	=	malloc.c			\
-		show_alloc_mem.c	\
-		free.c				\
-		realloc.c			\
-		malloc_good_size.c	\
-		calloc.c			\
-		reallocf.c			\
+clean:
+	make clean -C $(LIBDIR)
+	@echo "${RED}Cleaning $(NAME)${RESET} [${GREEN}✔${RESET}]"
+	@/bin/rm -rf $(OBJSDIR);
 
-OBJ = $(addprefix $(OBJ_FOLDER)/, $(SRC:.c=.o))
+fclean: clean
+	make fclean -C $(LIBDIR)
+	@echo "${RED}Purge $(NAME)${RESET} [${GREEN}✔${RESET}]"
+	@/bin/rm -f $(NAME) $(SHORTNAME)
+	@rm -rf $(NAME).dSYM
 
-all : $(NAME)
+re: fclean all
 
-$(NAME) : $(LIBFT) $(OBJ_FOLDER) $(OBJ)
-	$(CC) $(FLAGS) $(OBJ) -I $(INCLUDE_FOLDER) $(LIB) -shared -o $(NAME).so
-	@echo "\033[32m[ ✔ ] $@ compiled\033[0m"
-	@/bin/rm -f $(LINK)
-	@ln -fs $(NAME).so $(LINK)
-	@echo "$@ is linked to the system"
+.PHONY: all, clean, fclean, re, $(OBJSDIR)/$(DIRCORE), $(compile)
 
-$(OBJ_FOLDER):
-	@mkdir -p $@
-	@echo "creating $(NAME) object..."
-
-$(OBJ_FOLDER)/%.o: $(SRC_FOLDER)/%.c
-	@$(CC) -I $(INCLUDE_FOLDER) $(FLAGS) -c $< -o $@
-
-lib : all clean
-
-clean : $(LIBFT)clean
-	@/bin/rm -rf $(OBJ_FOLDER)
-	@/bin/rm $(LINK)
-	@echo "\033[33m[ ✔ ] $(NAME) objects deleted\033[0m"
-
-fclean : $(LIBFT)fclean
-	@/bin/rm -rf $(OBJ_FOLDER)
-	@/bin/rm -f $(LINK)
-	@echo "\033[33m[ ✔ ] $(NAME) objects deleted\033[0m"
-	@/bin/rm -f $(NAME).so
-	@echo "\033[33m[ ✔ ] $(NAME) deleted\033[0m"
-
-re : fclean all
-
-$(LIBFT):
-	@make -C $(LIBFT)
-
-$(LIBFT)clean:
-	@make clean -C $(LIBFT)
-
-$(LIBFT)fclean:
-	@make fclean -C $(LIBFT)
-
-.PHONY: $(LIBFT) $(OBJ_FOLDER)
+.SUFFIXES: .c .o
