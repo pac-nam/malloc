@@ -25,11 +25,11 @@ void				ft_putstr_fd(char const *s, int fd);
 void				ft_putendl_fd(char const *s, int fd);
 void				ft_putnbr_fd(int nb, int fd);
 void				ft_printmemory(void *ptr, int length);
-void                ft_putaddr(void *ptr);
-void                ft_putdbl(double nb);
+void				ft_putaddr(void *ptr);
+void				ft_putdbl(double nb);
 void				ft_putsize(size_t nb);
 
-int		            ft_printf(const char *str, ...);
+int					ft_printf(const char *str, ...);
 int					ft_printnchar(int nb, char c);
 
 #endif

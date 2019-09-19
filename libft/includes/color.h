@@ -21,11 +21,11 @@
 # define CYAN "\x1b[36m"
 # define RESET "\x1b[0m"
 
-void    ft_red(char const *str);
-void    ft_green(char const *str);
-void    ft_yellow(char const *str);
-void    ft_blue(char const *str);
-void    ft_magenta(char const *str);
-void    ft_cyan(char const *str);
+void	ft_red(char const *str);
+void	ft_green(char const *str);
+void	ft_yellow(char const *str);
+void	ft_blue(char const *str);
+void	ft_magenta(char const *str);
+void	ft_cyan(char const *str);
 
 #endif

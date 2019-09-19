@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <unistd.h>
-#include "colors.h"
+#include "color.h"
 #include "str.h"
 
 /*
