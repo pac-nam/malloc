@@ -8,12 +8,8 @@ endif
 ###############################
 ####### GLOBAL VARIABLE #######
 ###############################
-RED 		= 	\x1b[31m
-YELLOW	 	= 	\x1b[33m
-GREEN 		= 	\x1b[32m
-RESET 		= 	\x1b[0m
 SRCSDIR 	= 	srcs
-OBJSDIR 	= 	objects
+OBJSDIR 	= 	objs
 INCLUDES 	= 	includes
 DEBUG		=	-g3
 CFLAGS 		=  	-Wall -Werror -Wextra -Wpadded
@@ -41,11 +37,10 @@ OBJS 		= 	$(addprefix $(OBJSDIR)/, $(OBJ))
 all: $(NAME)
 
 $(NAME): $(LIBDIR)/$(LIB) $(OBJSDIR) $(OBJS)
-	@printf "Compiling $(NAME)${RESET}"
 	@$(CC) -shared -o $(NAME) $(OBJS) $(LIBDIR)/$(LIB)
 	@rm -rf libft_malloc.so
 	@ln -s $(NAME) libft_malloc.so
-	@echo " done [${GREEN}✔${RESET}]"
+	@echo "\033[32m[ ✔ ] $@ compiled\033[0m"
 
 compile:
 	@gcc tests/test0.c  -Iincludes/ -o tests/test0
@@ -55,27 +50,27 @@ compile:
 	@gcc tests/test3++.c -Iincludes/ -o tests/test3++
 	@gcc tests/test4.c -Iincludes/ -o tests/test4
 	@gcc tests/test5.c -Iincludes/ -L. -lft_malloc -o tests/test5
-	@echo "${RED}Compiling tests ${RESET} [${GREEN}✔${RESET}]"
+	@echo "Compiling tests"
 
 $(OBJSDIR)/%.o: $(SRCSDIR)/%.c $(HEADERS)
 	@$(CC) -c -o $@ $< -I$(INCLUDES)
 
 $(LIBDIR)/$(LIB):
-	make -C $(LIBDIR)
+	@make -C $(LIBDIR)
 
 $(OBJSDIR):
 	@mkdir -p $(OBJSDIR)/$(DIRCORE)
 
 clean:
-	make clean -C $(LIBDIR)
-	@echo "${RED}Cleaning $(NAME)${RESET} [${GREEN}✔${RESET}]"
+	@make clean -C $(LIBDIR)
 	@/bin/rm -rf $(OBJSDIR);
+	@echo "\033[33m[ ✔ ] $(NAME) objects deleted\033[0m"
 
 fclean: clean
-	make fclean -C $(LIBDIR)
-	@echo "${RED}Purge $(NAME)${RESET} [${GREEN}✔${RESET}]"
+	@make fclean -C $(LIBDIR)
 	@/bin/rm -f $(NAME) $(SHORTNAME)
 	@rm -rf $(NAME).dSYM
+	@echo "\033[33m[ ✔ ] $(NAME) deleted\033[0m"
 
 re: fclean all
 
