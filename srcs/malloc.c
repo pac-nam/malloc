@@ -16,17 +16,16 @@ void			*ft_find_cluster(t_block *page, int size)
 {
 	t_cluster	*cluster;
 
-	size += CLUSTERSIZE;
+	size = malloc_good_size(size) + CLUSTERSIZE;
 	while (page)
 	{
-		cluster = (void*)page + BLOCKSIZE;
-		while ((void*)cluster < (void*)page + page->size)
+		cluster = ((void*)page) + BLOCKSIZE;
+		while ((void*)cluster < (void*)page + page->size - size)
 		{
-			if (cluster->freesize >= size + (int)CLUSTERSIZE)
+			if (cluster->freesize > size)
 			{
-				if (cluster->freesize >= size + (int)CLUSTERSIZE)
-					((t_cluster*)((void*)cluster + size))->freesize =
-					cluster->freesize - size;
+				((t_cluster*)((void*)cluster + size))->freesize =
+				cluster->freesize - size;
 				cluster->freesize = -size;
 				return ((void*)cluster + CLUSTERSIZE);
 			}
@@ -67,16 +66,11 @@ void			*malloc(size_t size)
 {
 	void		*result;
 
-	size = malloc_good_size(size);
 	if (size <= TINY)
 	{
 		if (!(result = ft_find_cluster(g_alloc.tiny, size)))
-		{
 			if (ft_new_page(&g_alloc.tiny, TINY))
-			{
 				result = ft_find_cluster(g_alloc.tiny, size);
-			}
-		}
 	}
 	else if (size <= SMALL)
 	{

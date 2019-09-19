@@ -55,7 +55,7 @@ void			*realloc_size(t_block *page, t_cluster *to_realloc, int size)
 		c[2]->freesize = (-c[0]->freesize) - size;
 		c[0]->freesize = -size;
 	}
-	if ((int)((-c[0]->freesize) + c[1]->freesize) > size)
+	else if ((int)((-c[0]->freesize) + c[1]->freesize) > size)
 	{
 		if ((int)((-c[0]->freesize) + c[1]->freesize) != size)
 			c[2]->freesize = ((-c[0]->freesize) + c[1]->freesize) - size;

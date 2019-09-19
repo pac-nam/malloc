@@ -116,18 +116,12 @@ void			free(void *ptr)
 	{
 		cluster = ptr - CLUSTERSIZE;
 		if (cluster->freesize > 0)
-			;
+			return ;
 		else if (cluster->freesize == LARGE)
-		{
 			ft_free_page(&g_alloc.large, page);
-		}
 		else if (-cluster->freesize - CLUSTERSIZE <= TINY)
-		{
 			free_cluster(&g_alloc.tiny, page, cluster);
-		}
 		else if (-cluster->freesize - CLUSTERSIZE <= SMALL)
-		{
 			free_cluster(&g_alloc.small, page, cluster);
-		}
 	}
 }
